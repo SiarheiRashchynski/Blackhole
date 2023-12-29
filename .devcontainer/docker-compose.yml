@@ -1,0 +1,19 @@
+version: '3'
+name: 'blackhole-devcontainer'
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: blackhole.dev-environment
+        container_name: blackhole.dev-environment
+        volumes:
+            - ..:/workspace
+            - node_modules:/workspace/node_modules
+        command:
+            - sleep
+            - infinity
+            - bash
+        init: true
+volumes:
+    node_modules:

@@ -1,0 +1,17 @@
+{
+    "name": "blackhole",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/workspace",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "christian-kohler.npm-intellisense",
+                "esbenp.prettier-vscode",
+                "github.vscode-github-actions",
+                "Orta.vscode-jest"
+            ]
+        }
+    }
+}

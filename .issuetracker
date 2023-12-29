@@ -1,0 +1,7 @@
+# Integration with Issue Tracker
+#
+# (note that '\' need to be escaped).
+
+[issuetracker "Issue tracker"]
+  regex = "#(\\d+)"
+  url = "https://github.com/SiarheiRashchynski/Blackhole/issues/$1"
