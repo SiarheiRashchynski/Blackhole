@@ -17,11 +17,14 @@ jobs:
             - name: Install yarn
               run: npm install -g yarn
 
-            - name: Check and fix duplicates
-              run: yarn deduplicate && git diff --exit-code
-
             - name: Install Dependencies
               run: yarn install --frozen-lockfile
 
+            - name: Check and fix duplicates
+              run: yarn deduplicate && git diff --exit-code
+
             - name: Run lint
               run: yarn lint
+
+            - name: Run tests
+              run: yarn test
