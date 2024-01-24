@@ -3,5 +3,16 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": "explicit"
+    },
+    "cSpell.words": [
+        "blackhole",
+        "blackholes",
+        "execa",
+        "Persistable"
+    ],
+    // "jest.jestCommandLine": "yarn test --config jest.config.unit.js",
+    "jest.jestCommandLine": "yarn test --config jest.config.integration.js",
+    "[typescript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
     }
 }

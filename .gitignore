@@ -1,2 +1,5 @@
 node_modules/
 *.log
+data.json
+tests/data.json
+dist
