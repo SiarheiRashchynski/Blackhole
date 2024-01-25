@@ -8,12 +8,14 @@ import { path as basePath } from '../../../jest.setup.integration';
 describe('CreateBlackholeCommandHandler', () => {
     const databasePath = path.join(basePath, 'data.json');
 
-    beforeEach(async () => {
+    afterEach(async () => {
         try {
             await unlink(databasePath);
         } catch (err) {
             // Ignore
         }
+
+        console.log('afterEach');
     });
 
     it('should create a first blackhole', async () => {
@@ -32,6 +34,8 @@ describe('CreateBlackholeCommandHandler', () => {
                 Blackhole: expect.arrayContaining([{ name: 'blackhole1', password: 'password123' }]),
             }),
         );
+
+        console.log('first ends');
     });
 
     it('should add a blackhole to existing blackholes', async () => {
@@ -59,5 +63,32 @@ describe('CreateBlackholeCommandHandler', () => {
                 ]),
             }),
         );
+
+        console.log('second ends');
+    });
+
+    it('The blackhole should not be added since it exists', async () => {
+        // Arrange
+        const blackholes = {
+            Blackhole: [{ name: 'blackhole1', password: 'password123', path: Buffer.from('path'), salt: 'salt' }],
+        };
+        await writeFile(databasePath, JSON.stringify(blackholes));
+
+        // Act & Assert
+        await expect(
+            execa('yarn', ['start', 'map', 'blackhole1', 'password555'], {
+                env: { NODE_ENV: 'test' },
+            }),
+        ).rejects.toThrow(expect.objectContaining({ message: expect.stringContaining('Entity already exists') }));
+
+        const data = await readFile(databasePath, 'utf-8');
+        const db = JSON.parse(data);
+
+        expect(db.Blackhole.length).toBe(1);
+        expect(db.Blackhole).toEqual(
+            expect.arrayContaining([expect.objectContaining({ name: 'blackhole1', password: 'password123' })]),
+        );
+
+        console.log('third ends');
     });
 });

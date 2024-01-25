@@ -1,4 +1,4 @@
-import { readFile, writeFile, unlink, readdir, mkdir, rmdir } from 'fs/promises';
+import { readFile, writeFile, unlink, readdir, mkdir, rm } from 'fs/promises';
 
 import { FileOperations as FileOperationsInterface } from './abstractions';
 
@@ -8,7 +8,7 @@ export class FileOperations implements FileOperationsInterface {
     }
 
     public async deleteDirectory(path: string): Promise<void> {
-        await rmdir(path, { recursive: true });
+        await rm(path, { recursive: true });
     }
 
     public async readDirectory(path: string): Promise<string[]> {

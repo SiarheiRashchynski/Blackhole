@@ -10,6 +10,6 @@
         "execa",
         "Persistable"
     ],
-    // "jest.jestCommandLine": "yarn test --config jest.config.unit.json",
-    "jest.jestCommandLine": "yarn test --config jest.config.integration.json",
+    // "jest.jestCommandLine": "yarn unit-tests"
+    "jest.jestCommandLine": "yarn integration-tests"
 }

@@ -34,6 +34,7 @@
         "@typescript-eslint/no-unused-vars": "warn",
         "@typescript-eslint/member-ordering": "error",
         "@typescript-eslint/explicit-member-accessibility": "error",
+        "@typescript-eslint/no-floating-promises": "error",
 
         "import/order": [
             "warn",

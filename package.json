@@ -6,7 +6,9 @@
     },
     "scripts": {
         "start": "ts-node src/index.ts",
-        "test": "jest",
+        "tests": "jest",
+        "unit-tests": "jest --config jest.config.unit.json",
+        "integration-tests": "jest --config jest.config.integration.json --runInBand",
         "lint": "eslint --ext .ts src",
         "lint-fix": "eslint --ext .ts src --fix",
         "deduplicate": "npx yarn-deduplicate yarn.lock"
