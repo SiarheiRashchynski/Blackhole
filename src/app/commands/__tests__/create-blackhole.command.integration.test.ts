@@ -14,8 +14,6 @@ describe('CreateBlackholeCommandHandler', () => {
         } catch (err) {
             // Ignore
         }
-
-        console.log('afterEach');
     });
 
     it('should create a first blackhole', async () => {
@@ -34,8 +32,6 @@ describe('CreateBlackholeCommandHandler', () => {
                 Blackhole: expect.arrayContaining([{ name: 'blackhole1', password: 'password123' }]),
             }),
         );
-
-        console.log('first ends');
     });
 
     it('should add a blackhole to existing blackholes', async () => {
@@ -63,8 +59,6 @@ describe('CreateBlackholeCommandHandler', () => {
                 ]),
             }),
         );
-
-        console.log('second ends');
     });
 
     it('The blackhole should not be added since it exists', async () => {
@@ -88,7 +82,5 @@ describe('CreateBlackholeCommandHandler', () => {
         expect(db.Blackhole).toEqual(
             expect.arrayContaining([expect.objectContaining({ name: 'blackhole1', password: 'password123' })]),
         );
-
-        console.log('third ends');
     });
 });

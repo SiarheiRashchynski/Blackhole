@@ -20,7 +20,6 @@ export class JsonStorage extends Storage {
             if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
                 return {};
             } else {
-                console.log(error);
                 throw error;
             }
         }
