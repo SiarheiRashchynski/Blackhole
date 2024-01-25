@@ -8,13 +8,19 @@ describe('RemoveBlackholeCommandHandler', () => {
     let storage: jest.Mocked<Storage>;
     let cryptoProvider: jest.Mocked<CryptoProvider>;
     let privateDirectoryAccessor: jest.Mocked<PrivateDirectoryAccessor>;
-    const blackhole = { 
-        name: 'blackhole1', 
-        password: 'password123', 
-        getPath: jest.fn().mockResolvedValue('path')
+    const blackhole = {
+        name: 'blackhole1',
+        password: 'password123',
+        getPath: jest.fn().mockResolvedValue('path'),
     };
 
     beforeEach(() => {
+        privateDirectoryAccessor = {
+            delete: jest.fn(),
+        } as any;
+        cryptoProvider = {
+            check: jest.fn(),
+        } as any;
         storage = {
             save: jest.fn(),
             blackholes: {
@@ -22,12 +28,6 @@ describe('RemoveBlackholeCommandHandler', () => {
                 get: jest.fn().mockResolvedValue(blackhole),
                 save: jest.fn(),
             },
-        } as any;
-        privateDirectoryAccessor = {
-            delete: jest.fn(),
-        } as any,
-        cryptoProvider = {
-            check: jest.fn(),
         } as any;
 
         commandHandler = new RemoveBlackholeCommandHandler(storage, cryptoProvider, privateDirectoryAccessor);

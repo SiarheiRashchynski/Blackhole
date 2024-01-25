@@ -25,7 +25,12 @@ describe('CreateBlackholeCommandHandler', () => {
             },
             save: jest.fn(),
         } as any;
-        commandHandler = new CreateBlackholeCommandHandler(storage, cryptoProvider, privateDirectoryAccessor, pathGenerator);
+        commandHandler = new CreateBlackholeCommandHandler(
+            storage,
+            cryptoProvider,
+            privateDirectoryAccessor,
+            pathGenerator,
+        );
     });
 
     it('should create blackhole', async () => {

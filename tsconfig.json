@@ -10,7 +10,7 @@
         "experimentalDecorators": true
     },
     "types": ["node", "jest"],
-    "include": ["src/**/*.ts", "src/jest.setup.unit.js", "jest.config.js"],
+    "include": ["src/**/*.ts", "jest.config.js"],
     "exclude": ["node_modules"],
     "compiledFiles": ["dist/**/*.js"]
 }

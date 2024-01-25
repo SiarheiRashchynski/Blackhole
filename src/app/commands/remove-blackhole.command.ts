@@ -1,11 +1,11 @@
 import { inject, injectable } from 'tsyringe';
 
+import { CryptoProvider } from '../../domain/abstractions/crypto';
 import { Blackhole } from '../../domain/models';
 import { CommandHandler } from '../../infrastructure/commands/abstractions';
 import { CliCommand } from '../../infrastructure/commands/decorators';
 import { Storage } from '../../infrastructure/data/abstractions';
 import { PrivateDirectoryAccessor } from '../../infrastructure/shared/utils/filesystem/abstractions';
-import { CryptoProvider } from '../../domain/abstractions/crypto';
 
 export type RemoveBlackholeCommand = {
     name: string;
@@ -24,7 +24,7 @@ export class RemoveBlackholeCommandHandler implements CommandHandler<RemoveBlack
     public constructor(
         @inject('Storage') private readonly _storage: Storage,
         @inject('CryptoProvider') private readonly cryptoProvider: CryptoProvider,
-        @inject('PrivateDirectoryAccessor') private readonly _privateDirectoryAccessor: PrivateDirectoryAccessor
+        @inject('PrivateDirectoryAccessor') private readonly _privateDirectoryAccessor: PrivateDirectoryAccessor,
     ) {}
 
     public async handle({ name, password }: RemoveBlackholeCommand): Promise<void> {
@@ -38,13 +38,6 @@ export class RemoveBlackholeCommandHandler implements CommandHandler<RemoveBlack
         }
         this._storage.blackholes.delete({ name, password } as Blackhole);
         await this._storage.save();
-
-        try {
-            await this._privateDirectoryAccessor.delete(await blackhole.getPath(password, this.cryptoProvider));
-        } catch (error) {   
-            if ((error as any).code !== 'ENOENT') {
-                // ignore for now
-            }
-        }
+        await this._privateDirectoryAccessor.delete(await blackhole.getPath(password, this.cryptoProvider));
     }
 }

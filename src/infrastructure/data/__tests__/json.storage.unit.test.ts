@@ -18,7 +18,7 @@ describe('Storage', () => {
         // Arrange
         const blackhole = Blackhole.fromPersistence({
             name: 'blackhole1',
-            path:  Buffer.from('/path/to/blackhole'),
+            path: Buffer.from('/path/to/blackhole'),
             password: 'password123',
             salt: 'salt',
         });

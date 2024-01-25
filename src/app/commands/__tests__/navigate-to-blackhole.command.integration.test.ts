@@ -1,16 +1,17 @@
-import execa from 'execa';
 import { readFile, unlink } from 'fs/promises';
+
+import execa from 'execa';
 
 describe('NavigateToBlackholeCommandHandler', () => {
     const databasePath = '__tests__/data.json';
-    
+
     beforeEach(async () => {
         await unlink(databasePath);
     });
 
     it('should open a blackhole', async () => {
         // Araange
-        
+
         // Act
         await execa('yarn', ['start', 'remove', 'blackhole1', 'password123']);
 

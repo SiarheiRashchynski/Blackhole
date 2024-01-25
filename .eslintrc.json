@@ -15,15 +15,15 @@
             "rules": {
                 "@typescript-eslint/explicit-member-accessibility": "off",
                 "@typescript-eslint/no-explicit-any": "off",
-                "@typescript-eslint/quotes": ["warning", "single"]
+                "@typescript-eslint/quotes": ["warn", "single"]
             }
         },
         { 
-            "files": ["**/*decorator.ts"],
+            "files": ["**/*.decorator.ts"],
             "rules": {
                 "@typescript-eslint/no-explicit-any": "off"
             }
-        },
+        }
     ],
     "plugins": ["@typescript-eslint", "import", "prettier"],
     "rules": {

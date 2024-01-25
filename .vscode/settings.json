@@ -12,7 +12,7 @@
     ],
     // "jest.jestCommandLine": "yarn test --config jest.config.unit.js",
     "jest.jestCommandLine": "yarn test --config jest.config.integration.js",
-    "[typescript]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
-    }
+    // "[typescript]": {
+    //     "editor.defaultFormatter": "vscode.typescript-language-features"
+    // }
 }

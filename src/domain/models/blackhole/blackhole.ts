@@ -48,7 +48,12 @@ export class Blackhole implements Persistable, Comparable<Blackhole> {
         if (!name || !path || !password || !salt) {
             throw new Error('Invalid data.');
         }
-        return new Blackhole(name as string, Buffer.from(path as string) as Encrypted, password as Hashed, salt as string);
+        return new Blackhole(
+            name as string,
+            Buffer.from(path as string) as Encrypted,
+            password as Hashed,
+            salt as string,
+        );
     }
 
     public toPersistence(): Record<string, unknown> {
