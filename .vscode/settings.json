@@ -10,6 +10,5 @@
         "execa",
         "Persistable"
     ],
-    // "jest.jestCommandLine": "yarn unit-tests"
-    "jest.jestCommandLine": "yarn integration-tests"
+    "jest.jestCommandLine": "yarn unit-tests"
 }

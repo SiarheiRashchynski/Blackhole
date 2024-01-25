@@ -59,8 +59,6 @@ describe('NavigateToBlackholeCommandHandler', () => {
             password: 'password123',
         };
 
-        cryptoProvider.check.mockResolvedValue(true);
-
         const blackhole = { name: 'blackhole1', getPath: jest.fn(), salt: 'salt' } as unknown as Blackhole;
         (storage.blackholes.get as jest.Mock).mockResolvedValue(blackhole);
         (blackhole.getPath as jest.Mock).mockRejectedValue(new Error('Invalid password.'));
