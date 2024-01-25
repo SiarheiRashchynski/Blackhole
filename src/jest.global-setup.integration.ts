@@ -1,10 +1,13 @@
-import { existsSync } from 'fs';
 import { mkdir } from 'fs/promises';
 
-export const path = '__integration_tests__';
+import { path } from './jest.setup.integration';
+
+jest.setTimeout(30000);
 
 module.exports = async () => {
-    if (existsSync(path)) {
+    try {
         await mkdir(path);
+    } catch (err) {
+        // Ignore
     }
 };

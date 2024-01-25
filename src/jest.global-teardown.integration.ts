@@ -1,7 +1,11 @@
 import { rmdir } from 'fs/promises';
 
-import { path } from './jest.global-setup.integration';
+import { path } from './jest.setup.integration';
 
 module.exports = async () => {
-    await rmdir(path, { recursive: true });
+    try {
+        await rmdir(path, { recursive: true });
+    } catch (err) {
+        // Ignore
+    }
 };
