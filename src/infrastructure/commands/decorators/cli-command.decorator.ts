@@ -24,7 +24,7 @@ function cliCommandDecorator<TCommand>(
 function registerCommand<TCommand>(metadata: CliCommandMetadata<TCommand>, constructor: CommandConstructor<TCommand>) {
     addCliCommand(metadata.command, metadata.description, metadata.options || [], (...args: any[]) => {
         const instance = container.resolve(constructor) as CommandHandler<TCommand>;
-        instance.handle(metadata.mapRequest(...args));
+        return instance.handle(metadata.mapRequest(...args));
     });
 }
 
