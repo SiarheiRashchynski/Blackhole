@@ -3,12 +3,14 @@
         "target": "es6",
         "module": "commonjs",
         "outDir": "dist",
+        "importHelpers": true,
         "strict": true,
         "esModuleInterop": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true
     },
-    "include": ["src/**/*.ts"],
+    "types": ["node", "jest"],
+    "include": ["src/**/*.ts", "jest.config.js"],
     "exclude": ["node_modules"],
     "compiledFiles": ["dist/**/*.js"]
 }

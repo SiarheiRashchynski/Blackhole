@@ -3,5 +3,12 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": "explicit"
-    }
+    },
+    "cSpell.words": [
+        "blackhole",
+        "blackholes",
+        "execa",
+        "Persistable"
+    ],
+    "jest.jestCommandLine": "yarn unit-tests"
 }
