@@ -16,9 +16,7 @@ describe('NavigateToBlackholeCommandHandler', () => {
                 get: jest.fn(),
             },
         } as any;
-        cryptoProvider = {
-            check: jest.fn(),
-        } as any;
+        cryptoProvider = {} as any;
         privateDirectoryAccessor = {
             open: jest.fn(),
         } as any;
@@ -31,8 +29,6 @@ describe('NavigateToBlackholeCommandHandler', () => {
             name: 'blackhole1',
             password: 'password123',
         };
-
-        cryptoProvider.check.mockResolvedValue(true);
 
         const blackhole = { name: 'blackhole1', getPath: () => 'path', salt: 'salt' } as unknown as Blackhole;
         (storage.blackholes.get as jest.Mock).mockResolvedValue(blackhole);
@@ -76,8 +72,6 @@ describe('NavigateToBlackholeCommandHandler', () => {
             name: 'blackhole1',
             password: 'password123',
         };
-
-        cryptoProvider.check.mockResolvedValue(true);
 
         (storage.blackholes.get as jest.Mock).mockResolvedValue(undefined);
 

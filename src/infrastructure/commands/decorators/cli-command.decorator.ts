@@ -1,6 +1,5 @@
 import { container } from 'tsyringe';
 
-// import { container } from '../../../infrastructure/containers';
 import { CliCommandOption, addCliCommand } from '../../shared/utils';
 import { CommandHandler } from '../abstractions';
 
