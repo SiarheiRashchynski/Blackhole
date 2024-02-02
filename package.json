@@ -6,9 +6,10 @@
     },
     "scripts": {
         "start": "ts-node src/index.ts",
-        "tests": "jest",
         "unit-tests": "jest --config jest.config.unit.json",
+        "unit-tests-verbose": "LOG_LEVEL=verbose jest --config jest.config.unit.json",
         "integration-tests": "jest --config jest.config.integration.json --runInBand",
+        "integration-tests-verbose": "LOG_LEVEL=verbose jest --config jest.config.integration.json --runInBand",
         "lint": "eslint --ext .ts src",
         "lint-fix": "eslint --ext .ts src --fix",
         "deduplicate": "npx yarn-deduplicate yarn.lock"
@@ -29,7 +30,9 @@
         "typescript": "^5.3.3"
     },
     "dependencies": {
+        "@types/pluralize": "^0.0.33",
         "commander": "^11.1.0",
+        "pluralize": "^8.0.0",
         "reflect-metadata": "^0.2.1",
         "tsyringe": "^4.8.0"
     }

@@ -3,6 +3,8 @@ import { Storage } from '../../../infrastructure/data/abstractions';
 import { PrivateDirectoryAccessor } from '../../../infrastructure/shared/utils/filesystem/abstractions';
 import { RemoveBlackholeCommandHandler, RemoveBlackholeCommand } from '../remove-blackhole.command';
 
+jest.mock('../../../infrastructure/containers');
+
 describe('RemoveBlackholeCommandHandler', () => {
     let commandHandler: RemoveBlackholeCommandHandler;
     let storage: jest.Mocked<Storage>;

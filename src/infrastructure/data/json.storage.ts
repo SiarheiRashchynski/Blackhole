@@ -1,15 +1,27 @@
+import { injectAll } from 'tsyringe';
+
+import { EntityServices, EntityServicesToken } from '../containers';
 import { FileOperations } from '../shared/utils/filesystem/abstractions';
 
 import { Storage } from './abstractions';
 
 export class JsonStorage extends Storage {
-    private constructor(data: Record<string, object[]> = {}, fileOperations: FileOperations, path: string) {
-        super(data, fileOperations, path);
+    private constructor(
+        data: Record<string, object[]> = {},
+        @injectAll(EntityServicesToken) entityServices: EntityServices,
+        fileOperations: FileOperations,
+        path: string,
+    ) {
+        super(data, entityServices, fileOperations, path);
     }
 
-    public static async create(fileOperations: FileOperations, path: string = './data.json'): Promise<JsonStorage> {
+    public static async create(
+        fileOperations: FileOperations,
+        @injectAll(EntityServicesToken) entityServices: EntityServices,
+        path: string = './data.json',
+    ): Promise<JsonStorage> {
         const data = await this.loadAll(path, fileOperations);
-        return new JsonStorage(data, fileOperations, path);
+        return new JsonStorage(data, entityServices, fileOperations, path);
     }
 
     private static async loadAll(path: string, fs: FileOperations): Promise<Record<string, object[]>> {

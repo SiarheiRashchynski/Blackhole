@@ -4,6 +4,8 @@ import { Storage } from '../../../infrastructure/data/abstractions';
 import { PrivateDirectoryAccessor } from '../../../infrastructure/shared/utils/filesystem';
 import { NavigateToBlackholeCommand, NavigateToBlackholeCommandHandler } from '../navigate-to-blackhole.command';
 
+jest.mock('../../../infrastructure/containers');
+
 describe('NavigateToBlackholeCommandHandler', () => {
     let commandHandler: NavigateToBlackholeCommandHandler;
     let storage: jest.Mocked<Storage>;
