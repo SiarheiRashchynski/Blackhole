@@ -1,36 +1,37 @@
-import { Persistable, Comparable } from '../../../domain/abstractions';
+import { EntityService, Persistable } from '../abstractions';
 
-export class EntitySet<TEntity extends Persistable & Comparable<TEntity>> implements Persistable {
-    private readonly _entities: Record<string, unknown>[];
+export class EntitySet<TEntity> implements Persistable<string, object[]> {
+    private readonly _entities: TEntity[] = [];
 
     private readonly _collectionName: string;
 
     public constructor(
-        entityName: string,
         data: Record<string, object[]>,
-        private readonly fromPersistence: (data: Record<string, unknown>) => TEntity = (data) => data as TEntity,
+        public readonly entityService: EntityService<TEntity>,
     ) {
-        this._collectionName = entityName; // todo: pluralize
-        this._entities = (data[this._collectionName] as Record<string, unknown>[]) || [];
+        this._collectionName = this.entityService.entityName;
+        this._entities =
+            (data[this._collectionName] as Record<string, unknown>[])?.map((i) =>
+                this.entityService.factory.fromPersistence(i),
+            ) || [];
     }
 
-    public add(newEntity: TEntity): void {
-        if (this._entities.some((entity) => newEntity.isEqualByPrimaryKey(this.fromPersistence(entity)))) {
+    public async add(newEntity: TEntity): Promise<void> {
+        if (this._entities.some((entity) => this.entityService.comparator.areEqual(entity, newEntity))) {
             throw new Error('Entity already exists');
         }
-        this._entities.push(newEntity.toPersistence());
+        this._entities.push(newEntity);
     }
 
-    public update(currentEntity: TEntity, updatedEntity: TEntity): void {
+    public async update(currentEntity: TEntity, updatedEntity: TEntity): Promise<void> {
         this.delete(currentEntity);
-        this.add(updatedEntity);
+        await this.add(updatedEntity);
     }
 
-    public get(entityToFind: TEntity): Promise<TEntity | undefined> {
+    public async get(entityToFind: TEntity): Promise<TEntity | undefined> {
         for (const entity of this._entities) {
-            const entityInstance = this.fromPersistence(entity);
-            if (entityInstance.isEqualByPrimaryKey(entityToFind)) {
-                return Promise.resolve(entityInstance);
+            if (this.entityService.comparator.areEqual(entity, entityToFind)) {
+                return entity;
             }
         }
 
@@ -39,8 +40,7 @@ export class EntitySet<TEntity extends Persistable & Comparable<TEntity>> implem
 
     public delete(entityToFind: TEntity): void {
         for (let i = 0; i < this._entities.length; i++) {
-            const entityInstance = this.fromPersistence(this._entities[i]);
-            if (entityInstance.isEqualByPrimaryKey(entityToFind)) {
+            if (this.entityService.comparator.areEqual(this._entities[i], entityToFind)) {
                 this._entities.splice(i, 1);
                 return;
             }
@@ -49,7 +49,7 @@ export class EntitySet<TEntity extends Persistable & Comparable<TEntity>> implem
 
     public toPersistence(): Record<string, object[]> {
         return {
-            [this._collectionName]: this._entities,
+            [this._collectionName]: this._entities.map((i) => this.entityService.factory.toPersistence(i)),
         };
     }
 }

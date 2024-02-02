@@ -1,6 +1,6 @@
 import { rm } from 'fs/promises';
 
-import { path } from './jest.setup.integration';
+import { path } from './test-constants';
 
 module.exports = async () => {
     try {

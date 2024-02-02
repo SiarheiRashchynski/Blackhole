@@ -1,40 +1,58 @@
-import { Comparable, Persistable } from '../../../../domain/abstractions';
+import { EntityComparator, EntityFactory, EntityService } from '../../abstractions';
 import { EntitySet } from '../entity-set';
 
-class TestEntity implements Persistable, Comparable<TestEntity> {
+class TestEntity {
     public constructor(
         public id: number,
         public name: string,
     ) {}
+}
 
-    isEqualByPrimaryKey(entity: TestEntity): boolean {
-        return this.id === entity.id;
-    }
-
-    public toPersistence(): Record<string, unknown> {
-        return {
-            id: this.id,
-            name: this.name,
-        };
+class EntityComparatorMock implements EntityComparator<TestEntity> {
+    public areEqual(entity1: TestEntity, entity2: TestEntity): boolean {
+        return entity1.id === entity2.id;
     }
 }
 
+class EntityFactoryMock implements EntityFactory<TestEntity> {
+    public create(entity: TestEntity): Promise<TestEntity> {
+        return Promise.resolve(entity);
+    }
+
+    public fromPersistence(data: Record<string, unknown>): TestEntity {
+        return new TestEntity(data.id as number, data.name as string);
+    }
+
+    public toPersistence(entity: TestEntity): Record<string, unknown> {
+        return { id: entity.id, name: entity.name };
+    }
+}
+
+class EntityServiceMock implements EntityService<TestEntity> {
+    entityName: string = 'entity';
+
+    factory: EntityFactory<TestEntity> = new EntityFactoryMock();
+
+    comparator: EntityComparator<TestEntity> = new EntityComparatorMock();
+}
+
 describe('EntitySet', () => {
-    const entityName = 'entity';
-    const data: Record<string, object[]> = {};
-    const fromPersistenceMock = jest.fn((data) => new TestEntity(data.id as number, data.name as string));
+    let data: Record<string, object[]> = {};
     let entitySet: EntitySet<TestEntity>;
+    let entityServiceMock: jest.Mocked<EntityService<TestEntity>>;
 
     beforeEach(() => {
-        entitySet = new EntitySet(entityName, data, fromPersistenceMock);
+        data = {};
+        entityServiceMock = new EntityServiceMock();
+        entitySet = new EntitySet(data, entityServiceMock);
     });
 
-    it('should add a new entity', () => {
+    it('should add a new entity', async () => {
         // Arrange
         const newEntity = new TestEntity(1, 'Entity 1');
 
         // Act
-        entitySet.add(newEntity);
+        await entitySet.add(newEntity);
 
         // Assert
         expect(entitySet.toPersistence().entity.length).toBe(1);
@@ -50,23 +68,23 @@ describe('EntitySet', () => {
         );
     });
 
-    it('should throw an error when adding an existing entity', () => {
+    it('should throw an error when adding an existing entity', async () => {
         // Arrange
         const existingEntity = new TestEntity(1, 'Entity 1');
-        entitySet.add(existingEntity);
+        await entitySet.add(existingEntity);
 
         // Act & Assert
-        expect(() => entitySet.add(existingEntity)).toThrow('Entity already exists');
+        await expect(() => entitySet.add(existingEntity)).rejects.toThrow('Entity already exists');
     });
 
-    it('should update an existing entity', () => {
+    it('should update an existing entity', async () => {
         // Arrange
         const currentEntity = new TestEntity(1, 'Entity 1');
         const updatedEntity = new TestEntity(1, 'Updated Entity 1');
-        entitySet.add(currentEntity);
+        await entitySet.add(currentEntity);
 
         // Act
-        entitySet.update(currentEntity, updatedEntity);
+        await entitySet.update(currentEntity, updatedEntity);
 
         // Assert
         expect(entitySet.toPersistence()).toEqual(
@@ -80,7 +98,7 @@ describe('EntitySet', () => {
     it('should get an existing entity', async () => {
         // Arrange
         const entityToFind = new TestEntity(1, 'Entity 1');
-        entitySet.add(entityToFind);
+        await entitySet.add(entityToFind);
 
         // Act
         const result = await entitySet.get(entityToFind);
@@ -100,10 +118,10 @@ describe('EntitySet', () => {
         expect(result).toBeUndefined();
     });
 
-    it('should delete an existing entity', () => {
+    it('should delete an existing entity', async () => {
         // Arrange
         const entityToDelete = new TestEntity(1, 'Entity 1');
-        entitySet.add(entityToDelete);
+        await entitySet.add(entityToDelete);
 
         // Act
         entitySet.delete(entityToDelete);

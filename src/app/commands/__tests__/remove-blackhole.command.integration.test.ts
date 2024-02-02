@@ -4,7 +4,7 @@ import path from 'path';
 
 import execa from 'execa';
 
-import { path as basePath } from '../../../jest.setup.integration';
+import { path as basePath } from '../../../test-constants';
 
 describe('RemoveBlackholeCommandHandler', () => {
     const databasePath = path.join(basePath, 'data.json');
@@ -33,7 +33,7 @@ describe('RemoveBlackholeCommandHandler', () => {
         blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
         blackholeDirectories.push(path.join(basePath, 'blackhole2Path'));
         const blackholes = {
-            Blackhole: [
+            Blackholes: [
                 {
                     name: 'blackhole1',
                     password: 'password123',
@@ -58,12 +58,12 @@ describe('RemoveBlackholeCommandHandler', () => {
         // Assert
         const data = await readFile(databasePath, 'utf-8');
         const db = JSON.parse(data);
-        expect(db.Blackhole).not.toEqual(expect.arrayContaining([blackholes.Blackhole[0]]));
-        expect(db.Blackhole).toEqual(
+        expect(db.Blackholes).not.toEqual(expect.arrayContaining([blackholes.Blackholes[0]]));
+        expect(db.Blackholes).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    name: blackholes.Blackhole[1].name,
-                    password: blackholes.Blackhole[1].password,
+                    name: blackholes.Blackholes[1].name,
+                    password: blackholes.Blackholes[1].password,
                 }),
             ]),
         );
@@ -76,7 +76,7 @@ describe('RemoveBlackholeCommandHandler', () => {
         blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
         blackholeDirectories.push(path.join(basePath, 'blackhole2Path'));
         const blackholes = {
-            Blackhole: [
+            Blackholes: [
                 {
                     name: 'blackhole1',
                     password: 'password123',
@@ -105,16 +105,16 @@ describe('RemoveBlackholeCommandHandler', () => {
             }),
         ).rejects.toThrow(expect.objectContaining({ message: expect.stringContaining('Invalid password.') }));
 
-        expect(db.Blackhole.length).toBe(2);
-        expect(db.Blackhole).toEqual(
+        expect(db.Blackholes.length).toBe(2);
+        expect(db.Blackholes).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    name: blackholes.Blackhole[0].name,
-                    password: blackholes.Blackhole[0].password,
+                    name: blackholes.Blackholes[0].name,
+                    password: blackholes.Blackholes[0].password,
                 }),
                 expect.objectContaining({
-                    name: blackholes.Blackhole[1].name,
-                    password: blackholes.Blackhole[1].password,
+                    name: blackholes.Blackholes[1].name,
+                    password: blackholes.Blackholes[1].password,
                 }),
             ]),
         );
@@ -128,7 +128,7 @@ describe('RemoveBlackholeCommandHandler', () => {
         blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
         blackholeDirectories.push(path.join(basePath, 'blackhole2Path'));
         const blackholes = {
-            Blackhole: [
+            Blackholes: [
                 {
                     name: 'blackhole1',
                     password: 'password123',
@@ -157,16 +157,16 @@ describe('RemoveBlackholeCommandHandler', () => {
             }),
         ).rejects.toThrow(expect.objectContaining({ message: expect.stringContaining('Blackhole not found') }));
 
-        expect(db.Blackhole.length).toBe(2);
-        expect(db.Blackhole).toEqual(
+        expect(db.Blackholes.length).toBe(2);
+        expect(db.Blackholes).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    name: blackholes.Blackhole[0].name,
-                    password: blackholes.Blackhole[0].password,
+                    name: blackholes.Blackholes[0].name,
+                    password: blackholes.Blackholes[0].password,
                 }),
                 expect.objectContaining({
-                    name: blackholes.Blackhole[1].name,
-                    password: blackholes.Blackhole[1].password,
+                    name: blackholes.Blackholes[1].name,
+                    password: blackholes.Blackholes[1].password,
                 }),
             ]),
         );

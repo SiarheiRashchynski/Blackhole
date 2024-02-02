@@ -1,6 +1,6 @@
 import { mkdir } from 'fs/promises';
 
-import { path } from './jest.setup.integration';
+import { path } from './test-constants';
 
 module.exports = async () => {
     try {
@@ -9,3 +9,7 @@ module.exports = async () => {
         // Ignore
     }
 };
+
+// if (process.env.LOG_LEVEL !== 'verbose') {
+//     console.log = jest.fn(); // Mock console.log
+// }

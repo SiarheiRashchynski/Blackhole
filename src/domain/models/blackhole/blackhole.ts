@@ -1,9 +1,7 @@
-import { Comparable } from '../../abstractions';
-import { Persistable } from '../../abstractions';
 import { CryptoProvider, HashProvider } from '../../abstractions/crypto';
 import { Encrypted, Hashed } from '../../abstractions/crypto/types';
 
-export class Blackhole implements Persistable, Comparable<Blackhole> {
+export class Blackhole {
     private _name: string;
 
     private _path: Encrypted;
@@ -12,7 +10,7 @@ export class Blackhole implements Persistable, Comparable<Blackhole> {
 
     private _salt: string;
 
-    protected constructor(name: string, path: Encrypted, password: Hashed, salt: string) {
+    public constructor(name: string, path: Encrypted, password: Hashed, salt: string) {
         this._name = name;
         this._path = path;
         this._password = password;
@@ -31,42 +29,8 @@ export class Blackhole implements Persistable, Comparable<Blackhole> {
         return this._salt;
     }
 
-    public static async create(
-        name: string,
-        path: string,
-        password: string,
-        cryptoProvider: CryptoProvider,
-    ): Promise<Blackhole> {
-        const hashedPassword = await cryptoProvider.hash(password);
-        const securityKey = await cryptoProvider.generateSecurityKey(password, hashedPassword);
-        const encryptedPath = await cryptoProvider.encrypt(Buffer.from(path), securityKey);
-        const salt = cryptoProvider.generateSalt();
-        return new Blackhole(name, encryptedPath, hashedPassword, salt);
-    }
-
-    public static fromPersistence({ name, path, password, salt }: Record<string, unknown>): Blackhole {
-        if (!name || !path || !password || !salt) {
-            throw new Error('Invalid data.');
-        }
-        return new Blackhole(
-            name as string,
-            Buffer.from(path as string) as Encrypted,
-            password as Hashed,
-            salt as string,
-        );
-    }
-
-    public toPersistence(): Record<string, unknown> {
-        return {
-            name: this._name,
-            path: this._path.toJSON().data,
-            salt: this._salt,
-            password: this._password,
-        };
-    }
-
-    public isEqualByPrimaryKey(blackhole: Blackhole): boolean {
-        return blackhole.name === this._name;
+    public get path(): Encrypted {
+        return this._path;
     }
 
     public async setName(name: string, password: string, hashProvider: HashProvider): Promise<void> {

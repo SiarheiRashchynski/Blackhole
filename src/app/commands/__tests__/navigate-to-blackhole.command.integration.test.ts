@@ -3,7 +3,7 @@ import path from 'path';
 
 import execa from 'execa';
 
-import { path as basePath } from '../../../jest.setup.integration';
+import { path as basePath } from '../../../test-constants';
 
 describe('NavigateToBlackholeCommandHandler', () => {
     const databasePath = path.join(basePath, 'data.json');
@@ -29,7 +29,7 @@ describe('NavigateToBlackholeCommandHandler', () => {
         // Arrange
         blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
         const blackholes = {
-            Blackhole: [
+            Blackholes: [
                 {
                     name: 'blackhole1',
                     password: 'password123',
@@ -51,7 +51,7 @@ describe('NavigateToBlackholeCommandHandler', () => {
         // Arrange
         blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
         const blackholes = {
-            Blackhole: [
+            Blackholes: [
                 {
                     name: 'blackhole1',
                     password: 'password123',
@@ -73,7 +73,7 @@ describe('NavigateToBlackholeCommandHandler', () => {
         // Arrange
         blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
         const blackholes = {
-            Blackhole: [
+            Blackholes: [
                 {
                     name: 'blackhole1',
                     password: 'password123',

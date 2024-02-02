@@ -16,110 +16,25 @@ describe('Blackhole', () => {
         const name = 'blackhole1';
         const path = '/path/to/blackhole';
         const password = 'password123';
-        const hashedPassword = 'hashedPassword';
-        const securityKey = 'securityKey';
-        const encryptedPath = 'encryptedPath';
         const salt = 'salt';
 
-        cryptoProvider.hash = jest.fn().mockResolvedValue(hashedPassword);
-        cryptoProvider.generateSecurityKey = jest.fn().mockResolvedValue(securityKey);
-        cryptoProvider.encrypt = jest.fn().mockResolvedValue(encryptedPath);
-        cryptoProvider.generateSalt = jest.fn().mockReturnValue(salt);
-
         // Act
-        const blackhole = await Blackhole.create(name, path, password, cryptoProvider);
-
-        // Assert
-        expect(blackhole.name).toBe(name);
-        expect(blackhole.password).toBe(hashedPassword);
-        expect(blackhole.salt).toBe(salt);
-        expect(cryptoProvider.hash).toHaveBeenCalledWith(password);
-        expect(cryptoProvider.generateSecurityKey).toHaveBeenCalledWith(password, hashedPassword);
-        expect(cryptoProvider.encrypt).toHaveBeenCalledWith(Buffer.from(path), securityKey);
-        expect(cryptoProvider.generateSalt).toHaveBeenCalled();
-    });
-
-    it('should throw an error when creating a blackhole with invalid data', () => {
-        // Arrange
-        const invalidData = {
-            name: 'blackhole1',
-            path: '/path/to/blackhole',
-            password: 'password123',
-            salt: null,
-        };
-
-        // Act & Assert
-        expect(() => Blackhole.fromPersistence(invalidData)).toThrow('Invalid data.');
-    });
-
-    it('should create a blackhole from persistence data', () => {
-        // Arrange
-        const name = 'blackhole1';
-        const path = 'encryptedPath';
-        const password = 'hashedPassword';
-        const salt = 'salt';
-        const persistenceData = {
-            name,
-            path,
-            password,
-            salt,
-        };
-
-        // Act
-        const blackhole = Blackhole.fromPersistence(persistenceData);
+        const blackhole = new Blackhole(name, path as unknown as Encrypted, password as unknown as Hashed, salt);
 
         // Assert
         expect(blackhole.name).toBe(name);
         expect(blackhole.password).toBe(password);
         expect(blackhole.salt).toBe(salt);
-    });
-
-    it('should convert a blackhole to persistence data', () => {
-        // Arrange
-        const name = 'blackhole1';
-        const path = 'encryptedPath';
-        const password = 'hashedPassword';
-        const salt = 'salt';
-
-        const blackhole = Blackhole.fromPersistence({
-            name,
-            path,
-            password,
-            salt,
-        });
-
-        // Act
-        const persistenceData = blackhole.toPersistence();
-
-        // Assert
-        expect(persistenceData.name).toBe(name);
-        expect(Buffer.from(persistenceData.path as string).toString()).toBe(path);
-        expect(persistenceData.password).toBe(password);
-        expect(persistenceData.salt).toBe(salt);
-    });
-
-    it('should check if two blackholes are equal by primary key', () => {
-        // Arrange
-        const name = 'blackhole1';
-        const path = 'encryptedPath';
-        const password = 'hashedPassword';
-        const salt = 'salt';
-        const blackhole1 = Blackhole.fromPersistence({ name, path, password, salt });
-        const blackhole2 = Blackhole.fromPersistence({ name, path, password, salt });
-        const blackhole3 = Blackhole.fromPersistence({ name: 'blackhole2', path, password, salt });
-
-        // Act & Assert
-        expect(blackhole1.isEqualByPrimaryKey(blackhole2)).toBe(true);
-        expect(blackhole1.isEqualByPrimaryKey(blackhole3)).toBe(false);
+        expect((blackhole as any)['_path']).toBe(path);
     });
 
     it('should set the name of a blackhole', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath';
-        const password = 'hashedPassword';
+        const path = 'encryptedPath' as unknown as Encrypted;
+        const password = 'hashedPassword' as unknown as Hashed;
         const salt = 'salt';
-        const blackhole = Blackhole.fromPersistence({ name, path, password, salt });
+        const blackhole = new Blackhole(name, path, password, salt);
         const newName = 'newBlackhole1';
 
         cryptoProvider.check = jest.fn().mockResolvedValue(true);
@@ -135,10 +50,10 @@ describe('Blackhole', () => {
     it('should throw an error when setting the name of a blackhole with an invalid password', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath';
-        const password = 'hashedPassword';
+        const path = 'encryptedPath' as unknown as Encrypted;
+        const password = 'hashedPassword' as unknown as Hashed;
         const salt = 'salt';
-        const blackhole = Blackhole.fromPersistence({ name, path, password, salt });
+        const blackhole = new Blackhole(name, path, password, salt);
         const newName = 'newBlackhole1';
         const invalidPassword = 'invalidPassword';
 
@@ -153,10 +68,10 @@ describe('Blackhole', () => {
     it('should set the path of a blackhole', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath';
-        const password = 'hashedPassword';
+        const path = 'encryptedPath' as unknown as Encrypted;
+        const password = 'hashedPassword' as unknown as Hashed;
         const salt = 'salt';
-        const blackhole = Blackhole.fromPersistence({ name, path, password, salt });
+        const blackhole = new Blackhole(name, path, password, salt);
         const newPath = Buffer.from('newEncryptedPath') as Encrypted;
         const securityKey = 'securityKey';
         const encryptedPath = 'encryptedPath';
@@ -176,10 +91,10 @@ describe('Blackhole', () => {
     it('should throw an error when setting the path of a blackhole with an invalid password', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath';
-        const password = 'hashedPassword';
+        const path = 'encryptedPath' as unknown as Encrypted;
+        const password = 'hashedPassword' as unknown as Hashed;
         const salt = 'salt';
-        const blackhole = Blackhole.fromPersistence({ name, path, password, salt });
+        const blackhole = new Blackhole(name, path, password, salt);
         const newPath = Buffer.from('newEncryptedPath') as Encrypted;
         const invalidPassword = 'invalidPassword';
 
@@ -192,10 +107,10 @@ describe('Blackhole', () => {
     it('should get the path of a blackhole', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath';
-        const password = 'hashedPassword';
+        const path = 'encryptedPath' as unknown as Encrypted;
+        const password = 'hashedPassword' as unknown as Hashed;
         const salt = 'salt';
-        const blackhole = Blackhole.fromPersistence({ name, path, password, salt });
+        const blackhole = new Blackhole(name, path, password, salt);
         const decryptedPath = '/path/to/blackhole';
         const securityKey = 'securityKey';
 
@@ -208,16 +123,16 @@ describe('Blackhole', () => {
         // Assert
         expect(result).toBe(decryptedPath);
         expect(cryptoProvider.generateSecurityKey).toHaveBeenCalledWith(password, password);
-        expect(cryptoProvider.decrypt).toHaveBeenCalledWith(Buffer.from(path), securityKey);
+        expect(cryptoProvider.decrypt).toHaveBeenCalledWith(path, securityKey);
     });
 
     it('should throw an error when getting the path of a blackhole with an invalid password', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath';
-        const password = 'hashedPassword';
+        const path = 'encryptedPath' as unknown as Encrypted;
+        const password = 'hashedPassword' as unknown as Hashed;
         const salt = 'salt';
-        const blackhole = Blackhole.fromPersistence({ name, path, password, salt });
+        const blackhole = new Blackhole(name, path, password, salt);
         const invalidPassword = 'invalidPassword';
 
         cryptoProvider.check.mockResolvedValue(false);
@@ -229,10 +144,10 @@ describe('Blackhole', () => {
     it('should set the password of a blackhole', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath';
-        const password = 'hashedPassword';
+        const path = 'encryptedPath' as unknown as Encrypted;
+        const password = 'hashedPassword' as unknown as Hashed;
         const salt = 'salt';
-        const blackhole = Blackhole.fromPersistence({ name, path, password, salt });
+        const blackhole = new Blackhole(name, path, password, salt);
         const newPassword = 'newPassword123';
         const hashedPassword = 'newHashedPassword';
 
@@ -249,10 +164,10 @@ describe('Blackhole', () => {
     it('should throw an error when setting the password of a blackhole with an invalid password', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath';
-        const password = 'hashedPassword';
+        const path = 'encryptedPath' as unknown as Encrypted;
+        const password = 'hashedPassword' as unknown as Hashed;
         const salt = 'salt';
-        const blackhole = Blackhole.fromPersistence({ name, path, password, salt });
+        const blackhole = new Blackhole(name, path, password, salt);
         const invalidPassword = 'invalidPassword';
         const newPassword = 'newPassword123';
 
