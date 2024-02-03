@@ -1,20 +1,17 @@
-import { CryptoProvider, HashProvider } from '../../abstractions/crypto';
+import { HashProvider } from '../../abstractions/crypto';
 import { Encrypted, Hashed } from '../../abstractions/crypto/types';
 
 export class Blackhole {
     private _name: string;
 
-    private _path: Encrypted;
+    private _encryptedPath: Encrypted;
 
     private _password: Hashed;
 
-    private _salt: string;
-
-    public constructor(name: string, path: Encrypted, password: Hashed, salt: string) {
+    public constructor(name: string, path: Encrypted, password: Hashed) {
         this._name = name;
-        this._path = path;
+        this._encryptedPath = path;
         this._password = password;
-        this._salt = salt;
     }
 
     public get name(): string {
@@ -25,12 +22,8 @@ export class Blackhole {
         return this._password;
     }
 
-    public get salt(): string {
-        return this._salt;
-    }
-
     public get path(): Encrypted {
-        return this._path;
+        return this._encryptedPath;
     }
 
     public async setName(name: string, password: string, hashProvider: HashProvider): Promise<void> {
@@ -38,16 +31,9 @@ export class Blackhole {
         this._name = name;
     }
 
-    public async setPath(path: Encrypted, password: string, cryptoProvider: CryptoProvider): Promise<void> {
-        await this.passwordsMatchGuard(password, cryptoProvider);
-        const securityKey = await cryptoProvider.generateSecurityKey(password, this._password);
-        this._path = await cryptoProvider.encrypt(path, securityKey);
-    }
-
-    public async getPath(password: string, cryptoProvider: CryptoProvider): Promise<string> {
-        await this.passwordsMatchGuard(password, cryptoProvider);
-        const securityKey = await cryptoProvider.generateSecurityKey(password, this._password);
-        return (await cryptoProvider.decrypt(this._path, securityKey)).toString();
+    public async setPath(path: Encrypted, password: string, hashProvider: HashProvider): Promise<void> {
+        await this.passwordsMatchGuard(password, hashProvider);
+        this._encryptedPath = path;
     }
 
     public async setPassword(password: string, newPassword: string, hashProvider: HashProvider): Promise<void> {

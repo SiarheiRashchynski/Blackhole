@@ -1,11 +1,11 @@
 import { inject, injectable } from 'tsyringe';
 
-import { CryptoProvider } from '../../domain/abstractions/crypto';
+import { CryptoProvider, HashProvider } from '../../domain/abstractions/crypto';
 import { Blackhole } from '../../domain/models';
 import { CommandHandler } from '../../infrastructure/commands/abstractions';
 import { CliCommand } from '../../infrastructure/commands/decorators';
 import { Storage } from '../../infrastructure/data/abstractions';
-import { PrivateDirectoryAccessor } from '../../infrastructure/shared/utils/filesystem/abstractions';
+import { BlackholeAccessor as BlackholeAccessor } from '../../infrastructure/shared/utils/filesystem/abstractions';
 
 export type NavigateToBlackholeCommand = {
     name: string;
@@ -21,8 +21,8 @@ export type NavigateToBlackholeCommand = {
 export class NavigateToBlackholeCommandHandler implements CommandHandler<NavigateToBlackholeCommand> {
     public constructor(
         @inject('Storage') private readonly _storage: Storage,
-        @inject('PrivateDirectoryAccessor') private readonly _privateDirectoryAccessor: PrivateDirectoryAccessor,
-        @inject('CryptoProvider') private readonly _cryptoProvider: CryptoProvider,
+        @inject('HashProvider') private readonly hashProvider: HashProvider,
+        @inject('BlackholeAccessor') private readonly _blackholeAccessor: BlackholeAccessor,
     ) {}
 
     public async handle(request: NavigateToBlackholeCommand): Promise<void> {
@@ -30,7 +30,9 @@ export class NavigateToBlackholeCommandHandler implements CommandHandler<Navigat
         if (!blackhole) {
             throw new Error(`Blackhole '${request.name}' not found.`);
         }
-        const path = await blackhole.getPath(request.password, this._cryptoProvider);
-        await this._privateDirectoryAccessor.open(blackhole.name, path, request.password, blackhole.salt);
+        if (!(await this.hashProvider.check(request.password, blackhole.password))) {
+            throw new Error('Invalid password.');
+        }
+        await this._blackholeAccessor.open(blackhole, request.password);
     }
 }

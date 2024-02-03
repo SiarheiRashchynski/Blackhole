@@ -1,11 +1,11 @@
 import { inject, injectable } from 'tsyringe';
 
-import { CryptoProvider } from '../../domain/abstractions/crypto';
+import { HashProvider } from '../../domain/abstractions/crypto';
 import { Blackhole } from '../../domain/models';
 import { CommandHandler } from '../../infrastructure/commands/abstractions';
 import { CliCommand } from '../../infrastructure/commands/decorators';
 import { Storage } from '../../infrastructure/data/abstractions';
-import { PrivateDirectoryAccessor } from '../../infrastructure/shared/utils/filesystem/abstractions';
+import { BlackholeAccessor } from '../../infrastructure/shared/utils/filesystem/abstractions';
 
 export type RemoveBlackholeCommand = {
     name: string;
@@ -23,8 +23,8 @@ export type RemoveBlackholeCommand = {
 export class RemoveBlackholeCommandHandler implements CommandHandler<RemoveBlackholeCommand> {
     public constructor(
         @inject('Storage') private readonly _storage: Storage,
-        @inject('CryptoProvider') private readonly cryptoProvider: CryptoProvider,
-        @inject('PrivateDirectoryAccessor') private readonly _privateDirectoryAccessor: PrivateDirectoryAccessor,
+        @inject('HashProvider') private readonly hashProvider: HashProvider,
+        @inject('BlackholeAccessor') private readonly _blackholeAccessor: BlackholeAccessor,
     ) {}
 
     public async handle({ name, password }: RemoveBlackholeCommand): Promise<void> {
@@ -33,11 +33,11 @@ export class RemoveBlackholeCommandHandler implements CommandHandler<RemoveBlack
             throw new Error('Blackhole not found.');
         }
 
-        if (!(await this.cryptoProvider.check(password, blackhole.password))) {
+        if (!(await this.hashProvider.check(password, blackhole.password))) {
             throw new Error('Invalid password.');
         }
         this._storage.blackholes.delete({ name, password } as Blackhole);
+        await this._blackholeAccessor.delete(blackhole, password);
         await this._storage.save();
-        await this._privateDirectoryAccessor.delete(await blackhole.getPath(password, this.cryptoProvider));
     }
 }
