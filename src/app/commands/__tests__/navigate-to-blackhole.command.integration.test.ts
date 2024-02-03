@@ -55,16 +55,10 @@ describe('NavigateToBlackholeCommandHandler', () => {
 
     it('should open a blackhole', async () => {
         // Arrange
-        blackholeDirectories.push(path.join(basePath, 'blackhole1Source'));
-        blackholeDirectories.push(path.join(basePath, 'blackhole1Destination'));
+        blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
 
         const password = 'password123';
-        const blackhole = await entityFactory.create(
-            'blackhole1',
-            blackholeDirectories[0],
-            blackholeDirectories[1],
-            password,
-        );
+        const blackhole = await entityFactory.create('blackhole1', 'password123', blackholeDirectories[0]);
         await storage.blackholes.add(blackhole);
         await blackholeAccessor.map(blackhole, password);
         await storage.save();
@@ -77,16 +71,10 @@ describe('NavigateToBlackholeCommandHandler', () => {
 
     it('should not open the blackhole because of invalid password', async () => {
         // Arrange
-        blackholeDirectories.push(path.join(basePath, 'blackhole1Source'));
-        blackholeDirectories.push(path.join(basePath, 'blackhole1Destination'));
+        blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
 
         const password = 'password123';
-        const blackhole = await entityFactory.create(
-            'blackhole1',
-            blackholeDirectories[0],
-            blackholeDirectories[1],
-            'password123',
-        );
+        const blackhole = await entityFactory.create('blackhole1', 'password123', blackholeDirectories[0]);
         await storage.blackholes.add(blackhole);
         await blackholeAccessor.map(blackhole, password);
         await storage.save();
@@ -99,16 +87,10 @@ describe('NavigateToBlackholeCommandHandler', () => {
 
     it('should not open the blackhole because it was not found', async () => {
         // Arrange
-        blackholeDirectories.push(path.join(basePath, 'blackhole1Source'));
-        blackholeDirectories.push(path.join(basePath, 'blackhole1Destination'));
+        blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
 
         const password = 'password123';
-        const blackhole = await entityFactory.create(
-            'blackhole1',
-            blackholeDirectories[0],
-            blackholeDirectories[1],
-            'password123',
-        );
+        const blackhole = await entityFactory.create('blackhole1', 'password123', blackholeDirectories[0]);
         await storage.blackholes.add(blackhole);
         await blackholeAccessor.map(blackhole, password);
         await storage.save();

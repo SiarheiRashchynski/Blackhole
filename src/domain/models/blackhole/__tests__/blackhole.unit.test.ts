@@ -14,27 +14,24 @@ describe('Blackhole', () => {
     it('should create a blackhole', async () => {
         // Arrange
         const name = 'blackhole1';
-        const source = '/source-path/to/blackhole' as Encrypted;
-        const destination = '/destination-path/to/blackhole' as Encrypted;
+        const path = '/path/to/blackhole' as Encrypted;
         const password = 'password123';
 
         // Act
-        const blackhole = new Blackhole(name, source, destination, password as unknown as Hashed);
+        const blackhole = new Blackhole(name, path, password as unknown as Hashed);
 
         // Assert
         expect(blackhole.name).toBe(name);
         expect(blackhole.password).toBe(password);
-        expect(blackhole.source).toBe(source);
-        expect(blackhole.destination).toBe(destination);
+        expect(blackhole.path).toBe(path);
     });
 
     it('should set the name of a blackhole', async () => {
         // Arrange
         const name = 'blackhole1';
-        const source = 'encryptedSource' as Encrypted;
-        const destination = 'encryptedSource' as Encrypted;
+        const path = 'encryptedPath' as Encrypted;
         const password = 'hashedPassword' as unknown as Hashed;
-        const blackhole = new Blackhole(name, source, destination, password);
+        const blackhole = new Blackhole(name, path, password);
         const newName = 'newBlackhole1';
 
         hashProvider.check = jest.fn().mockResolvedValue(true);
@@ -50,10 +47,9 @@ describe('Blackhole', () => {
     it('should throw an error when setting the name of a blackhole with an invalid password', async () => {
         // Arrange
         const name = 'blackhole1';
-        const source = 'encryptedSource' as Encrypted;
-        const destination = 'encryptedSource' as Encrypted;
+        const path = 'encryptedPath' as Encrypted;
         const password = 'hashedPassword' as unknown as Hashed;
-        const blackhole = new Blackhole(name, source, destination, password);
+        const blackhole = new Blackhole(name, path, password);
         const newName = 'newBlackhole1';
         const invalidPassword = 'invalidPassword';
 
@@ -68,64 +64,41 @@ describe('Blackhole', () => {
     it('should set the path of a blackhole', async () => {
         // Arrange
         const name = 'blackhole1';
-        const source = 'encryptedSource' as Encrypted;
-        const destination = 'encryptedSource' as Encrypted;
+        const path = 'encryptedPath' as Encrypted;
         const password = 'hashedPassword' as unknown as Hashed;
-        const blackhole = new Blackhole(name, source, destination, password);
+        const blackhole = new Blackhole(name, path, password);
         const newPath = 'newPath' as Encrypted;
 
         hashProvider.check = jest.fn().mockResolvedValue(true);
 
         // Act
-        await blackhole.setSource(newPath, password, hashProvider);
+        await blackhole.setPath(newPath, password, hashProvider);
 
         // Assert
-        expect(blackhole.source).toBe(newPath);
-        expect(blackhole.destination).toBe(destination);
-    });
-
-    it('should set the path of a blackhole', async () => {
-        // Arrange
-        const name = 'blackhole1';
-        const source = 'encryptedSource' as Encrypted;
-        const destination = 'encryptedSource' as Encrypted;
-        const password = 'hashedPassword' as unknown as Hashed;
-        const blackhole = new Blackhole(name, source, destination, password);
-        const newPath = 'newPath' as Encrypted;
-
-        hashProvider.check = jest.fn().mockResolvedValue(true);
-
-        // Act
-        await blackhole.setDestination(newPath, password, hashProvider);
-
-        // Assert
-        expect(blackhole.source).toBe(source);
-        expect(blackhole.destination).toBe(newPath);
+        expect(blackhole.path).toBe(newPath);
     });
 
     it('should throw an error when setting the path of a blackhole with an invalid password', async () => {
         // Arrange
         const name = 'blackhole1';
-        const source = 'encryptedSource' as Encrypted;
-        const destination = 'encryptedSource' as Encrypted;
+        const path = 'encryptedPath' as Encrypted;
         const password = 'hashedPassword' as unknown as Hashed;
-        const blackhole = new Blackhole(name, source, destination, password);
+        const blackhole = new Blackhole(name, path, password);
         const newPath = 'newEncryptedPath' as Encrypted;
         const invalidPassword = 'invalidPassword';
 
         hashProvider.check.mockResolvedValue(false);
 
         // Act & Assert
-        await expect(blackhole.setSource(newPath, invalidPassword, hashProvider)).rejects.toThrow('Invalid password.');
+        await expect(blackhole.setPath(newPath, invalidPassword, hashProvider)).rejects.toThrow('Invalid password.');
     });
 
     it('should set the password of a blackhole', async () => {
         // Arrange
         const name = 'blackhole1';
-        const source = 'encryptedSource' as Encrypted;
-        const destination = 'encryptedSource' as Encrypted;
+        const path = 'encryptedPath' as Encrypted;
         const password = 'hashedPassword' as unknown as Hashed;
-        const blackhole = new Blackhole(name, source, destination, password);
+        const blackhole = new Blackhole(name, path, password);
         const newPassword = 'newPassword123';
         const hashedPassword = 'newHashedPassword';
 
@@ -142,10 +115,9 @@ describe('Blackhole', () => {
     it('should throw an error when setting the password of a blackhole with an invalid password', async () => {
         // Arrange
         const name = 'blackhole1';
-        const source = 'encryptedSource' as Encrypted;
-        const destination = 'encryptedSource' as Encrypted;
+        const path = 'encryptedPath' as Encrypted;
         const password = 'hashedPassword' as unknown as Hashed;
-        const blackhole = new Blackhole(name, source, destination, password);
+        const blackhole = new Blackhole(name, path, password);
         const invalidPassword = 'invalidPassword';
         const newPassword = 'newPassword123';
 

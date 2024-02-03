@@ -27,7 +27,7 @@ describe('MapBlackholeCommandHanlder', () => {
             save: jest.fn(),
         } as any;
         blackholeEntityFactory = {
-            create: jest.fn((name, source, destination, password) => ({ name, password, source, destination })),
+            create: jest.fn((name, password, path) => ({ name, password, path })),
         } as any;
         commandHandler = new MapBlackholeCommandHandler(
             storage,
@@ -42,43 +42,18 @@ describe('MapBlackholeCommandHanlder', () => {
         const request: MapBlackholeCommand = {
             name: 'blackhole1',
             password: 'password123',
-            sourceDestination: 'source',
         };
-        const source = 'source';
-        const dest = 'generated-dest';
-        pathGenerator.generatePath.mockResolvedValue(dest);
+
+        pathGenerator.generatePath.mockResolvedValue('path');
 
         // Act
         await commandHandler.handle(request);
 
         // Assert
-        const expectedBlackhole = { name: request.name, password: request.password, source: source, destination: dest };
         expect(pathGenerator.generatePath).toHaveBeenCalled();
-        expect(blackholeEntityFactory.create).toHaveBeenCalledWith(request.name, source, dest, request.password);
-        expect(storage.blackholes.add).toHaveBeenCalledWith(expectedBlackhole);
+        expect(blackholeEntityFactory.create).toHaveBeenCalledWith(request.name, request.password, 'path');
+        expect(storage.blackholes.add).toHaveBeenCalledWith({ ...request, path: 'path' });
         expect(storage.save).toHaveBeenCalled();
-        expect(blackholeAccessor.map).toHaveBeenCalledWith(expectedBlackhole, request.password);
-    });
-
-    it('should create blackhole with the specified destination', async () => {
-        // Arrange
-        const request: MapBlackholeCommand = {
-            name: 'blackhole1',
-            password: 'password123',
-            sourceDestination: 'source:dest',
-        };
-        const source = 'source';
-        const dest = 'dest';
-
-        // Act
-        await commandHandler.handle(request);
-
-        // Assert
-        const expectedBlackhole = { name: request.name, password: request.password, source: source, destination: dest };
-        expect(pathGenerator.generatePath).toHaveBeenCalledTimes(0);
-        expect(blackholeEntityFactory.create).toHaveBeenCalledWith(request.name, source, dest, request.password);
-        expect(storage.blackholes.add).toHaveBeenCalledWith(expectedBlackhole);
-        expect(storage.save).toHaveBeenCalled();
-        expect(blackholeAccessor.map).toHaveBeenCalledWith(expectedBlackhole, request.password);
+        expect(blackholeAccessor.map).toHaveBeenCalledWith({ ...request, path: 'path' }, request.password);
     });
 });

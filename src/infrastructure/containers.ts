@@ -22,6 +22,8 @@ import { SimplePathGenerator } from './shared/utils/filesystem/simple-path-gener
 export type EntityServices = Record<string, EntityService<unknown>>;
 export const EntityServicesToken: InjectionToken<EntityServices> = Symbol('Services');
 
+console.log('test');
+
 export async function registerDependencies(): Promise<void> {
     container.register<HashProviderInterface>('HashProvider', { useClass: HashProvider });
     container.register<CipherProviderInterface>('CipherProvider', { useClass: CipherProvider });

@@ -56,24 +56,12 @@ describe('RemoveBlackholeCommandHandler', () => {
 
     it('should remove a blackhole', async () => {
         // Arrange
-        blackholeDirectories.push(path.join(basePath, 'blackhole1Source'));
-        blackholeDirectories.push(path.join(basePath, 'blackhole1Dest'));
-        blackholeDirectories.push(path.join(basePath, 'blackhole2Source'));
-        blackholeDirectories.push(path.join(basePath, 'blackhole2Dest'));
+        blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
+        blackholeDirectories.push(path.join(basePath, 'blackhole2Path'));
 
         const password = 'password123';
-        const blackhole1 = await entityFactory.create(
-            'blackhole1',
-            blackholeDirectories[0],
-            blackholeDirectories[1],
-            password,
-        );
-        const blackhole2 = await entityFactory.create(
-            'blackhole2',
-            blackholeDirectories[2],
-            blackholeDirectories[3],
-            password,
-        );
+        const blackhole1 = await entityFactory.create('blackhole1', password, blackholeDirectories[0]);
+        const blackhole2 = await entityFactory.create('blackhole2', password, blackholeDirectories[1]);
         await storage.blackholes.add(blackhole1);
         await storage.blackholes.add(blackhole2);
         await blackholeAccessor.map(blackhole1, password);
@@ -109,23 +97,11 @@ describe('RemoveBlackholeCommandHandler', () => {
     it('should not remove any blackhole since the password is incorret', async () => {
         // Arrange
         blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
-        blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
-        blackholeDirectories.push(path.join(basePath, 'blackhole2Path'));
         blackholeDirectories.push(path.join(basePath, 'blackhole2Path'));
 
         const password = 'password123';
-        const blackhole1 = await entityFactory.create(
-            'blackhole1',
-            blackholeDirectories[0],
-            blackholeDirectories[1],
-            password,
-        );
-        const blackhole2 = await entityFactory.create(
-            'blackhole2',
-            blackholeDirectories[2],
-            blackholeDirectories[3],
-            password,
-        );
+        const blackhole1 = await entityFactory.create('blackhole1', password, blackholeDirectories[0]);
+        const blackhole2 = await entityFactory.create('blackhole2', password, blackholeDirectories[1]);
         await storage.blackholes.add(blackhole1);
         await storage.blackholes.add(blackhole2);
         await blackholeAccessor.map(blackhole1, password);
@@ -163,23 +139,11 @@ describe('RemoveBlackholeCommandHandler', () => {
     it('should not remove any blackhole since the entity was not found', async () => {
         // Arrange
         blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
-        blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
-        blackholeDirectories.push(path.join(basePath, 'blackhole2Path'));
         blackholeDirectories.push(path.join(basePath, 'blackhole2Path'));
 
         const password = 'password123';
-        const blackhole1 = await entityFactory.create(
-            'blackhole1',
-            blackholeDirectories[0],
-            blackholeDirectories[1],
-            password,
-        );
-        const blackhole2 = await entityFactory.create(
-            'blackhole2',
-            blackholeDirectories[2],
-            blackholeDirectories[3],
-            password,
-        );
+        const blackhole1 = await entityFactory.create('blackhole1', password, blackholeDirectories[0]);
+        const blackhole2 = await entityFactory.create('blackhole2', password, blackholeDirectories[1]);
         await storage.blackholes.add(blackhole1);
         await storage.blackholes.add(blackhole2);
         await blackholeAccessor.map(blackhole1, password);

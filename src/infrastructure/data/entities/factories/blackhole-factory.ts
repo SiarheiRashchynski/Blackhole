@@ -9,29 +9,22 @@ import { EntityFactory } from '../../abstractions';
 export class BlackholeEntityFactory implements EntityFactory<Blackhole> {
     public constructor(@inject('CryptoProvider') private readonly _cryptoProvider: CryptoProvider) {}
 
-    public async create(name: string, source: string, destination: string, password: string): Promise<Blackhole> {
-        const encryptedSource = await this._cryptoProvider.encrypt(Buffer.from(source), password);
-        const encryptedDestination = await this._cryptoProvider.encrypt(Buffer.from(destination), password);
+    public async create(name: string, password: string, path: string): Promise<Blackhole> {
+        const encryptedPath = await this._cryptoProvider.encrypt(Buffer.from(path), password);
         const hashedPassword = await this._cryptoProvider.hash(password);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return new Blackhole(name, encryptedSource, encryptedDestination, hashedPassword);
+        return new Blackhole(name, encryptedPath, hashedPassword);
     }
 
     public fromPersistence(data: Record<string, unknown>): Blackhole {
-        return new Blackhole(
-            data.name as string,
-            data.source as Encrypted,
-            data.destination as Encrypted,
-            data.password as Hashed,
-        );
+        return new Blackhole(data.name as string, data.path as Encrypted, data.password as Hashed);
     }
 
     public toPersistence(entity: Blackhole): Record<string, unknown> {
         return {
             name: entity.name,
-            source: entity.source,
-            destination: entity.destination,
+            path: entity.path,
             password: entity.password,
         };
     }
