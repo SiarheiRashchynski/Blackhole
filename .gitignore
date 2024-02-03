@@ -4,3 +4,4 @@ data.json
 tests/data.json
 dist
 __intergration_tests__
+.vscode

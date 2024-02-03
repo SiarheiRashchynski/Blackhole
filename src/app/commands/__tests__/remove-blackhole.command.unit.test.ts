@@ -1,6 +1,6 @@
 import { CryptoProvider } from '../../../domain/abstractions/crypto';
 import { Storage } from '../../../infrastructure/data/abstractions';
-import { PrivateDirectoryAccessor } from '../../../infrastructure/shared/utils/filesystem/abstractions';
+import { BlackholeAccessor } from '../../../infrastructure/shared/utils/filesystem/abstractions';
 import { RemoveBlackholeCommandHandler, RemoveBlackholeCommand } from '../remove-blackhole.command';
 
 jest.mock('../../../infrastructure/containers');
@@ -9,15 +9,15 @@ describe('RemoveBlackholeCommandHandler', () => {
     let commandHandler: RemoveBlackholeCommandHandler;
     let storage: jest.Mocked<Storage>;
     let cryptoProvider: jest.Mocked<CryptoProvider>;
-    let privateDirectoryAccessor: jest.Mocked<PrivateDirectoryAccessor>;
+    let blackholeAccessor: jest.Mocked<BlackholeAccessor>;
     const blackhole = {
         name: 'blackhole1',
         password: 'password123',
-        getPath: jest.fn().mockResolvedValue('path'),
+        path: 'path',
     };
 
     beforeEach(() => {
-        privateDirectoryAccessor = {
+        blackholeAccessor = {
             delete: jest.fn(),
         } as any;
         cryptoProvider = {
@@ -32,7 +32,7 @@ describe('RemoveBlackholeCommandHandler', () => {
             },
         } as any;
 
-        commandHandler = new RemoveBlackholeCommandHandler(storage, cryptoProvider, privateDirectoryAccessor);
+        commandHandler = new RemoveBlackholeCommandHandler(storage, cryptoProvider, blackholeAccessor);
     });
 
     it('should remove the blackhole', async () => {
@@ -51,8 +51,7 @@ describe('RemoveBlackholeCommandHandler', () => {
         expect(cryptoProvider.check).toHaveBeenCalledWith(request.password, 'password123');
         expect(storage.blackholes.delete).toHaveBeenCalledWith(expect.objectContaining({ name: request.name }));
         expect(storage.save).toHaveBeenCalled();
-        expect(blackhole.getPath).toHaveBeenCalledWith(request.password, cryptoProvider);
-        expect(privateDirectoryAccessor.delete).toHaveBeenCalledWith('path');
+        expect(blackholeAccessor.delete).toHaveBeenCalledWith(blackhole, request.password);
     });
 
     it('the blackhole should not be removed because the password is invalid', async () => {

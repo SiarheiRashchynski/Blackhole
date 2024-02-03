@@ -5,7 +5,7 @@ import execa from 'execa';
 
 import { path as basePath } from '../../../test-constants';
 
-describe('CreateBlackholeCommandHandler', () => {
+describe('MapBlackholeCommandHanlder', () => {
     const databasePath = path.join(basePath, 'data.json');
 
     afterEach(async () => {

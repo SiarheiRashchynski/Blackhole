@@ -1,21 +1,21 @@
 import { Blackhole } from '../../../domain/models';
 import { EntityFactory } from '../../../infrastructure/data/abstractions';
 import { Storage } from '../../../infrastructure/data/abstractions';
-import { PathGenerator, PrivateDirectoryAccessor } from '../../../infrastructure/shared/utils/filesystem/abstractions';
-import { CreateBlackholeCommandHandler, CreateBlackholeCommand } from '../create-blackhole.command';
+import { PathGenerator, BlackholeAccessor } from '../../../infrastructure/shared/utils/filesystem/abstractions';
+import { MapBlackholeCommandHandler, MapBlackholeCommand } from '../map-blackhole.command';
 
 jest.mock('../../../infrastructure/containers');
 
-describe('CreateBlackholeCommandHandler', () => {
-    let commandHandler: CreateBlackholeCommandHandler;
+describe('MapBlackholeCommandHanlder', () => {
+    let commandHandler: MapBlackholeCommandHandler;
     let storage: jest.Mocked<Storage>;
-    let privateDirectoryAccessor: jest.Mocked<PrivateDirectoryAccessor>;
+    let blackholeAccessor: jest.Mocked<BlackholeAccessor>;
     let pathGenerator: jest.Mocked<PathGenerator>;
     let blackholeEntityFactory: jest.Mocked<EntityFactory<Blackhole>>;
 
     beforeEach(() => {
-        privateDirectoryAccessor = {
-            create: jest.fn(),
+        blackholeAccessor = {
+            map: jest.fn(),
         } as any;
         pathGenerator = {
             generatePath: jest.fn(),
@@ -29,9 +29,9 @@ describe('CreateBlackholeCommandHandler', () => {
         blackholeEntityFactory = {
             create: jest.fn((name, password, path) => ({ name, password, path })),
         } as any;
-        commandHandler = new CreateBlackholeCommandHandler(
+        commandHandler = new MapBlackholeCommandHandler(
             storage,
-            privateDirectoryAccessor,
+            blackholeAccessor,
             pathGenerator,
             blackholeEntityFactory,
         );
@@ -39,7 +39,7 @@ describe('CreateBlackholeCommandHandler', () => {
 
     it('should create blackhole', async () => {
         // Arrange
-        const request: CreateBlackholeCommand = {
+        const request: MapBlackholeCommand = {
             name: 'blackhole1',
             password: 'password123',
         };
@@ -54,6 +54,6 @@ describe('CreateBlackholeCommandHandler', () => {
         expect(blackholeEntityFactory.create).toHaveBeenCalledWith(request.name, request.password, 'path');
         expect(storage.blackholes.add).toHaveBeenCalledWith({ ...request, path: 'path' });
         expect(storage.save).toHaveBeenCalled();
-        expect(privateDirectoryAccessor.create).toHaveBeenCalledWith('path');
+        expect(blackholeAccessor.map).toHaveBeenCalledWith({ ...request, path: 'path' }, request.password);
     });
 });

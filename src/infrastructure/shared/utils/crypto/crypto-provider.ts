@@ -14,14 +14,6 @@ export class CryptoProvider implements CryptoProviderInterface {
         @inject('CipherProvider') private readonly _cipherProvider: CipherProvider,
     ) {}
 
-    public generateSalt(): string {
-        return this._cipherProvider.generateSalt();
-    }
-
-    public generateSecurityKey(password: string, salt: string): Promise<string> {
-        return this._cipherProvider.generateSecurityKey(password, salt);
-    }
-
     public hash(password: string): Promise<Hashed> {
         return this._hashProvider.hash(password);
     }

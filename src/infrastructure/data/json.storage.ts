@@ -26,7 +26,7 @@ export class JsonStorage extends Storage {
 
     private static async loadAll(path: string, fs: FileOperations): Promise<Record<string, object[]>> {
         try {
-            const data = await fs.read(path);
+            const data = (await fs.read(path)).toString();
             return JSON.parse(data);
         } catch (error: unknown) {
             if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
@@ -40,11 +40,9 @@ export class JsonStorage extends Storage {
     public async save(): Promise<void> {
         await this.fs.write(
             this.path,
-            Buffer.from(
-                JSON.stringify({
-                    ...this._blackholes.toPersistence(),
-                }),
-            ),
+            JSON.stringify({
+                ...this._blackholes.toPersistence(),
+            }),
         );
     }
 }
