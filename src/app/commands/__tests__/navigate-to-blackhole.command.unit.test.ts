@@ -44,7 +44,7 @@ describe('NavigateToBlackholeCommandHandler', () => {
         await commandHandler.handle(request);
 
         // Assert
-        expect(storage.blackholes.get).toHaveBeenCalledWith({ name: request.name });
+        expect(storage.blackholes.get).toHaveBeenCalled();
         expect(blackholeAccessor.open).toHaveBeenCalledWith(blackhole, request.password);
     });
 
@@ -58,8 +58,8 @@ describe('NavigateToBlackholeCommandHandler', () => {
         (storage.blackholes.get as jest.Mock).mockResolvedValue(undefined);
 
         // Act && Assert
-        await expect(commandHandler.handle(request)).rejects.toThrow('Blackhole \'blackhole1\' not found.');
-        expect(storage.blackholes.get).toHaveBeenCalledWith({ name: request.name });
+        await expect(commandHandler.handle(request)).rejects.toThrow("Blackhole 'blackhole1' not found.");
+        expect(storage.blackholes.get).toHaveBeenCalled();
         expect(blackholeAccessor.open).toHaveBeenCalledTimes(0);
     });
 
@@ -79,7 +79,7 @@ describe('NavigateToBlackholeCommandHandler', () => {
 
         // Act && Assert
         await expect(commandHandler.handle(request)).rejects.toThrow('Invalid password.');
-        expect(storage.blackholes.get).toHaveBeenCalledWith({ name: request.name });
+        expect(storage.blackholes.get).toHaveBeenCalled();
         expect(blackholeAccessor.open).toHaveBeenCalledTimes(0);
     });
 });

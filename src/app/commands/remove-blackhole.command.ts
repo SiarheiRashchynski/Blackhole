@@ -28,7 +28,7 @@ export class RemoveBlackholeCommandHandler implements CommandHandler<RemoveBlack
     ) {}
 
     public async handle({ name, password }: RemoveBlackholeCommand): Promise<void> {
-        const blackhole = await this._storage.blackholes.get({ name } as Blackhole);
+        const blackhole = await this._storage.blackholes.get((entity) => entity.name === name);
         if (!blackhole) {
             throw new Error('Blackhole not found.');
         }
@@ -36,7 +36,7 @@ export class RemoveBlackholeCommandHandler implements CommandHandler<RemoveBlack
         if (!(await this.hashProvider.check(password, blackhole.password))) {
             throw new Error('Invalid password.');
         }
-        this._storage.blackholes.delete({ name, password } as Blackhole);
+        this._storage.blackholes.delete((entity) => entity.name === name);
         await this._blackholeAccessor.delete(blackhole, password);
         await this._storage.save();
     }

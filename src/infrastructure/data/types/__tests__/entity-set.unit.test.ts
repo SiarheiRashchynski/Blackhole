@@ -84,7 +84,7 @@ describe('EntitySet', () => {
         await entitySet.add(currentEntity);
 
         // Act
-        await entitySet.update(currentEntity, updatedEntity);
+        await entitySet.update((e) => e.id == currentEntity.id, updatedEntity);
 
         // Assert
         expect(entitySet.toPersistence()).toEqual(
@@ -101,7 +101,7 @@ describe('EntitySet', () => {
         await entitySet.add(entityToFind);
 
         // Act
-        const result = await entitySet.get(entityToFind);
+        const result = await entitySet.get((e) => e.id === entityToFind.id);
 
         // Assert
         expect(result).toEqual(entityToFind);
@@ -112,7 +112,7 @@ describe('EntitySet', () => {
         const entityToFind = new TestEntity(1, 'Entity 1');
 
         // Act
-        const result = await entitySet.get(entityToFind);
+        const result = await entitySet.get((e) => e.id === entityToFind.id);
 
         // Assert
         expect(result).toBeUndefined();
@@ -124,7 +124,7 @@ describe('EntitySet', () => {
         await entitySet.add(entityToDelete);
 
         // Act
-        entitySet.delete(entityToDelete);
+        entitySet.delete((e) => e.id === entityToDelete.id);
 
         // Assert
         expect(entitySet.toPersistence()).not.toContainEqual(entityToDelete);

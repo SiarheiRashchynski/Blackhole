@@ -23,24 +23,18 @@ export class EntitySet<TEntity> implements Persistable<string, object[]> {
         this._entities.push(newEntity);
     }
 
-    public async update(currentEntity: TEntity, updatedEntity: TEntity): Promise<void> {
-        this.delete(currentEntity);
+    public async update(predicate: (entity: TEntity) => boolean, updatedEntity: TEntity): Promise<void> {
+        this.delete(predicate);
         await this.add(updatedEntity);
     }
 
-    public async get(entityToFind: TEntity): Promise<TEntity | undefined> {
-        for (const entity of this._entities) {
-            if (this.entityService.comparator.areEqual(entity, entityToFind)) {
-                return entity;
-            }
-        }
-
-        return Promise.resolve(undefined);
+    public get(predicate: (entity: TEntity) => boolean): TEntity | undefined {
+        return this._entities.find(predicate);
     }
 
-    public delete(entityToFind: TEntity): void {
+    public delete(predicate: (entity: TEntity) => boolean): void {
         for (let i = 0; i < this._entities.length; i++) {
-            if (this.entityService.comparator.areEqual(this._entities[i], entityToFind)) {
+            if (predicate(this._entities[i])) {
                 this._entities.splice(i, 1);
                 return;
             }

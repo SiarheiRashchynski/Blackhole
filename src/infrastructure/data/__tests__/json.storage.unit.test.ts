@@ -117,7 +117,7 @@ describe('Storage', () => {
         storage = await JsonStorage.create(fileOperations, EntityServices);
 
         // Act
-        const data = await storage.blackholes.get({ name: existingBlackhole.name } as Blackhole);
+        const data = await storage.blackholes.get((entity) => entity.name === existingBlackhole.name);
 
         // Assert
         expect(EntityServices.BlackholeEntityService.factory.toPersistence(data!)).toEqual(
@@ -150,7 +150,7 @@ describe('Storage', () => {
         storage = await JsonStorage.create(fileOperations, EntityServices);
 
         // Act
-        await storage.blackholes.update({ name: existingBlackhole.name } as Blackhole, newBlackhole);
+        await storage.blackholes.update((entity) => entity.name === existingBlackhole.name, newBlackhole);
         await storage.save();
 
         // Assert
@@ -192,7 +192,7 @@ describe('Storage', () => {
         storage = await JsonStorage.create(fileOperations, EntityServices);
 
         // Act
-        storage.blackholes.delete({ name: existingBlackholes[0].name } as Blackhole);
+        storage.blackholes.delete((entity) => entity.name === existingBlackholes[0].name);
         await storage.save();
 
         // Assert
