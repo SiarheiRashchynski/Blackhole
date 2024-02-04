@@ -4,7 +4,7 @@ import { FileOperations as FileOperationsInterface } from './abstractions';
 
 export class FileOperations implements FileOperationsInterface {
     public async createDirectory(path: string): Promise<void> {
-        await mkdir(path);
+        await mkdir(path, { recursive: true });
     }
 
     public async deleteDirectory(path: string): Promise<void> {
@@ -15,12 +15,12 @@ export class FileOperations implements FileOperationsInterface {
         return await readdir(path);
     }
 
-    public async read(path: string): Promise<string> {
-        return await readFile(path, 'utf8');
+    public async read(path: string): Promise<Buffer> {
+        return await readFile(path);
     }
 
-    public async write(path: string, data: Buffer): Promise<void> {
-        return writeFile(path, data, 'utf8');
+    public async write(path: string, data: string): Promise<void> {
+        return writeFile(path, data);
     }
 
     public async delete(path: string): Promise<void> {

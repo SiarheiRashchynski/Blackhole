@@ -1,14 +1,40 @@
 import { R_OK } from 'constants';
-import { access, mkdir, readFile, rm, unlink, writeFile } from 'fs/promises';
+import { access, readFile, rm, unlink } from 'fs/promises';
 import path from 'path';
 
 import execa from 'execa';
 
+import { Storage } from '../../../infrastructure/data/abstractions';
+import { BlackholeEntityService } from '../../../infrastructure/data/entities';
+import { BlackholeEntityComparator } from '../../../infrastructure/data/entities/comparators';
+import { BlackholeEntityFactory } from '../../../infrastructure/data/entities/factories';
+import { JsonStorage } from '../../../infrastructure/data/json.storage';
+import { CipherProvider, CryptoProvider, HashProvider } from '../../../infrastructure/shared/utils/crypto';
+import { BlackholeAccessor, FileOperations } from '../../../infrastructure/shared/utils/filesystem';
 import { path as basePath } from '../../../test-constants';
 
 describe('RemoveBlackholeCommandHandler', () => {
     const databasePath = path.join(basePath, 'data.json');
+    const cryptoProvider = new CryptoProvider(new HashProvider(), new CipherProvider());
+    const entityFactory = new BlackholeEntityFactory(cryptoProvider);
+    const fileOperations = new FileOperations();
+    const blackholeAccessor = new BlackholeAccessor(fileOperations, cryptoProvider);
+
     let blackholeDirectories: string[] = [];
+    let storage: Storage;
+
+    beforeEach(async () => {
+        storage = await JsonStorage.create(
+            fileOperations,
+            {
+                [BlackholeEntityService.name]: new BlackholeEntityService(
+                    new BlackholeEntityComparator(),
+                    entityFactory,
+                ),
+            },
+            databasePath,
+        );
+    });
 
     afterEach(async () => {
         try {
@@ -30,27 +56,29 @@ describe('RemoveBlackholeCommandHandler', () => {
 
     it('should remove a blackhole', async () => {
         // Arrange
-        blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
-        blackholeDirectories.push(path.join(basePath, 'blackhole2Path'));
-        const blackholes = {
-            Blackholes: [
-                {
-                    name: 'blackhole1',
-                    password: 'password123',
-                    path: Buffer.from(blackholeDirectories[0]),
-                    salt: 'salt',
-                },
-                {
-                    name: 'blackhole2',
-                    password: 'password123',
-                    path: Buffer.from(blackholeDirectories[1]),
-                    salt: 'salt',
-                },
-            ],
-        };
-        await mkdir(blackholeDirectories[0]);
-        await mkdir(blackholeDirectories[1]);
-        await writeFile(databasePath, JSON.stringify(blackholes));
+        blackholeDirectories.push(path.join(basePath, 'blackhole1Source'));
+        blackholeDirectories.push(path.join(basePath, 'blackhole1Dest'));
+        blackholeDirectories.push(path.join(basePath, 'blackhole2Source'));
+        blackholeDirectories.push(path.join(basePath, 'blackhole2Dest'));
+
+        const password = 'password123';
+        const blackhole1 = await entityFactory.create(
+            'blackhole1',
+            blackholeDirectories[0],
+            blackholeDirectories[1],
+            password,
+        );
+        const blackhole2 = await entityFactory.create(
+            'blackhole2',
+            blackholeDirectories[2],
+            blackholeDirectories[3],
+            password,
+        );
+        await storage.blackholes.add(blackhole1);
+        await storage.blackholes.add(blackhole2);
+        await blackholeAccessor.map(blackhole1, password);
+        await blackholeAccessor.map(blackhole2, password);
+        await storage.save();
 
         //Act
         await execa('yarn', ['start', 'remove', 'blackhole1', 'password123']);
@@ -58,12 +86,19 @@ describe('RemoveBlackholeCommandHandler', () => {
         // Assert
         const data = await readFile(databasePath, 'utf-8');
         const db = JSON.parse(data);
-        expect(db.Blackholes).not.toEqual(expect.arrayContaining([blackholes.Blackholes[0]]));
+        expect(db.Blackholes).not.toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    name: blackhole1.name,
+                    password: blackhole1.password,
+                }),
+            ]),
+        );
         expect(db.Blackholes).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    name: blackholes.Blackholes[1].name,
-                    password: blackholes.Blackholes[1].password,
+                    name: blackhole2.name,
+                    password: blackhole2.password,
                 }),
             ]),
         );
@@ -74,26 +109,28 @@ describe('RemoveBlackholeCommandHandler', () => {
     it('should not remove any blackhole since the password is incorret', async () => {
         // Arrange
         blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
+        blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
         blackholeDirectories.push(path.join(basePath, 'blackhole2Path'));
-        const blackholes = {
-            Blackholes: [
-                {
-                    name: 'blackhole1',
-                    password: 'password123',
-                    path: Buffer.from(blackholeDirectories[0]),
-                    salt: 'salt',
-                },
-                {
-                    name: 'blackhole2',
-                    password: 'password123',
-                    path: Buffer.from(blackholeDirectories[1]),
-                    salt: 'salt',
-                },
-            ],
-        };
-        await mkdir(blackholeDirectories[0]);
-        await mkdir(blackholeDirectories[1]);
-        await writeFile(databasePath, JSON.stringify(blackholes));
+        blackholeDirectories.push(path.join(basePath, 'blackhole2Path'));
+
+        const password = 'password123';
+        const blackhole1 = await entityFactory.create(
+            'blackhole1',
+            blackholeDirectories[0],
+            blackholeDirectories[1],
+            password,
+        );
+        const blackhole2 = await entityFactory.create(
+            'blackhole2',
+            blackholeDirectories[2],
+            blackholeDirectories[3],
+            password,
+        );
+        await storage.blackholes.add(blackhole1);
+        await storage.blackholes.add(blackhole2);
+        await blackholeAccessor.map(blackhole1, password);
+        await blackholeAccessor.map(blackhole2, password);
+        await storage.save();
 
         // Act && Assert
         const data = await readFile(databasePath, 'utf-8');
@@ -109,12 +146,12 @@ describe('RemoveBlackholeCommandHandler', () => {
         expect(db.Blackholes).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    name: blackholes.Blackholes[0].name,
-                    password: blackholes.Blackholes[0].password,
+                    name: blackhole1.name,
+                    password: blackhole1.password,
                 }),
                 expect.objectContaining({
-                    name: blackholes.Blackholes[1].name,
-                    password: blackholes.Blackholes[1].password,
+                    name: blackhole2.name,
+                    password: blackhole2.password,
                 }),
             ]),
         );
@@ -126,26 +163,28 @@ describe('RemoveBlackholeCommandHandler', () => {
     it('should not remove any blackhole since the entity was not found', async () => {
         // Arrange
         blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
+        blackholeDirectories.push(path.join(basePath, 'blackhole1Path'));
         blackholeDirectories.push(path.join(basePath, 'blackhole2Path'));
-        const blackholes = {
-            Blackholes: [
-                {
-                    name: 'blackhole1',
-                    password: 'password123',
-                    path: Buffer.from(blackholeDirectories[0]),
-                    salt: 'salt',
-                },
-                {
-                    name: 'blackhole2',
-                    password: 'password123',
-                    path: Buffer.from(blackholeDirectories[1]),
-                    salt: 'salt',
-                },
-            ],
-        };
-        await mkdir(blackholeDirectories[0]);
-        await mkdir(blackholeDirectories[1]);
-        await writeFile(databasePath, JSON.stringify(blackholes));
+        blackholeDirectories.push(path.join(basePath, 'blackhole2Path'));
+
+        const password = 'password123';
+        const blackhole1 = await entityFactory.create(
+            'blackhole1',
+            blackholeDirectories[0],
+            blackholeDirectories[1],
+            password,
+        );
+        const blackhole2 = await entityFactory.create(
+            'blackhole2',
+            blackholeDirectories[2],
+            blackholeDirectories[3],
+            password,
+        );
+        await storage.blackholes.add(blackhole1);
+        await storage.blackholes.add(blackhole2);
+        await blackholeAccessor.map(blackhole1, password);
+        await blackholeAccessor.map(blackhole2, password);
+        await storage.save();
 
         // Act && Assert
         const data = await readFile(databasePath, 'utf-8');
@@ -161,12 +200,12 @@ describe('RemoveBlackholeCommandHandler', () => {
         expect(db.Blackholes).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    name: blackholes.Blackholes[0].name,
-                    password: blackholes.Blackholes[0].password,
+                    name: blackhole1.name,
+                    password: blackhole1.password,
                 }),
                 expect.objectContaining({
-                    name: blackholes.Blackholes[1].name,
-                    password: blackholes.Blackholes[1].password,
+                    name: blackhole2.name,
+                    password: blackhole2.password,
                 }),
             ]),
         );

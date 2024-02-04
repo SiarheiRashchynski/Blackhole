@@ -1,12 +1,12 @@
-import { CryptoProvider } from '../../../abstractions/crypto';
+import { HashProvider } from '../../../../infrastructure/shared/utils/crypto';
 import { Encrypted, Hashed } from '../../../abstractions/crypto/types';
 import { Blackhole } from '../blackhole';
 
 describe('Blackhole', () => {
-    let cryptoProvider: jest.Mocked<CryptoProvider>;
+    let hashProvider: jest.Mocked<HashProvider>;
 
     beforeEach(() => {
-        cryptoProvider = {
+        hashProvider = {
             check: jest.fn().mockResolvedValue(true),
         } as any;
     });
@@ -14,167 +14,145 @@ describe('Blackhole', () => {
     it('should create a blackhole', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = '/path/to/blackhole';
+        const source = '/source-path/to/blackhole' as Encrypted;
+        const destination = '/destination-path/to/blackhole' as Encrypted;
         const password = 'password123';
-        const salt = 'salt';
 
         // Act
-        const blackhole = new Blackhole(name, path as unknown as Encrypted, password as unknown as Hashed, salt);
+        const blackhole = new Blackhole(name, source, destination, password as unknown as Hashed);
 
         // Assert
         expect(blackhole.name).toBe(name);
         expect(blackhole.password).toBe(password);
-        expect(blackhole.salt).toBe(salt);
-        expect((blackhole as any)['_path']).toBe(path);
+        expect(blackhole.source).toBe(source);
+        expect(blackhole.destination).toBe(destination);
     });
 
     it('should set the name of a blackhole', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath' as unknown as Encrypted;
+        const source = 'encryptedSource' as Encrypted;
+        const destination = 'encryptedSource' as Encrypted;
         const password = 'hashedPassword' as unknown as Hashed;
-        const salt = 'salt';
-        const blackhole = new Blackhole(name, path, password, salt);
+        const blackhole = new Blackhole(name, source, destination, password);
         const newName = 'newBlackhole1';
 
-        cryptoProvider.check = jest.fn().mockResolvedValue(true);
+        hashProvider.check = jest.fn().mockResolvedValue(true);
 
         // Act
-        await blackhole.setName(newName, password, cryptoProvider);
+        await blackhole.setName(newName, password, hashProvider);
 
         // Assert
         expect(blackhole.name).toBe(newName);
-        expect(cryptoProvider.check).toHaveBeenCalledWith(password, password);
+        expect(hashProvider.check).toHaveBeenCalledWith(password, password);
     });
 
     it('should throw an error when setting the name of a blackhole with an invalid password', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath' as unknown as Encrypted;
+        const source = 'encryptedSource' as Encrypted;
+        const destination = 'encryptedSource' as Encrypted;
         const password = 'hashedPassword' as unknown as Hashed;
-        const salt = 'salt';
-        const blackhole = new Blackhole(name, path, password, salt);
+        const blackhole = new Blackhole(name, source, destination, password);
         const newName = 'newBlackhole1';
         const invalidPassword = 'invalidPassword';
 
-        cryptoProvider.check = jest.fn().mockResolvedValue(false);
+        hashProvider.check = jest.fn().mockResolvedValue(false);
 
         // Act & Assert
-        await expect(blackhole.setName(newName, invalidPassword, cryptoProvider)).rejects.toThrow('Invalid password.');
+        await expect(blackhole.setName(newName, invalidPassword, hashProvider)).rejects.toThrow('Invalid password.');
         expect(blackhole.name).toBe(name);
-        expect(cryptoProvider.check).toHaveBeenCalledWith(invalidPassword, password);
+        expect(hashProvider.check).toHaveBeenCalledWith(invalidPassword, password);
     });
 
     it('should set the path of a blackhole', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath' as unknown as Encrypted;
+        const source = 'encryptedSource' as Encrypted;
+        const destination = 'encryptedSource' as Encrypted;
         const password = 'hashedPassword' as unknown as Hashed;
-        const salt = 'salt';
-        const blackhole = new Blackhole(name, path, password, salt);
-        const newPath = Buffer.from('newEncryptedPath') as Encrypted;
-        const securityKey = 'securityKey';
-        const encryptedPath = 'encryptedPath';
+        const blackhole = new Blackhole(name, source, destination, password);
+        const newPath = 'newPath' as Encrypted;
 
-        cryptoProvider.generateSecurityKey = jest.fn().mockResolvedValue(securityKey);
-        cryptoProvider.encrypt = jest.fn().mockResolvedValue(encryptedPath);
-        cryptoProvider.check = jest.fn().mockResolvedValue(true);
+        hashProvider.check = jest.fn().mockResolvedValue(true);
 
         // Act
-        await blackhole.setPath(newPath, password, cryptoProvider);
+        await blackhole.setSource(newPath, password, hashProvider);
 
         // Assert
-        expect(cryptoProvider.generateSecurityKey).toHaveBeenCalledWith(password, password);
-        expect(cryptoProvider.encrypt).toHaveBeenCalledWith(newPath, securityKey);
+        expect(blackhole.source).toBe(newPath);
+        expect(blackhole.destination).toBe(destination);
+    });
+
+    it('should set the path of a blackhole', async () => {
+        // Arrange
+        const name = 'blackhole1';
+        const source = 'encryptedSource' as Encrypted;
+        const destination = 'encryptedSource' as Encrypted;
+        const password = 'hashedPassword' as unknown as Hashed;
+        const blackhole = new Blackhole(name, source, destination, password);
+        const newPath = 'newPath' as Encrypted;
+
+        hashProvider.check = jest.fn().mockResolvedValue(true);
+
+        // Act
+        await blackhole.setDestination(newPath, password, hashProvider);
+
+        // Assert
+        expect(blackhole.source).toBe(source);
+        expect(blackhole.destination).toBe(newPath);
     });
 
     it('should throw an error when setting the path of a blackhole with an invalid password', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath' as unknown as Encrypted;
+        const source = 'encryptedSource' as Encrypted;
+        const destination = 'encryptedSource' as Encrypted;
         const password = 'hashedPassword' as unknown as Hashed;
-        const salt = 'salt';
-        const blackhole = new Blackhole(name, path, password, salt);
-        const newPath = Buffer.from('newEncryptedPath') as Encrypted;
+        const blackhole = new Blackhole(name, source, destination, password);
+        const newPath = 'newEncryptedPath' as Encrypted;
         const invalidPassword = 'invalidPassword';
 
-        cryptoProvider.check.mockResolvedValue(false);
+        hashProvider.check.mockResolvedValue(false);
 
         // Act & Assert
-        await expect(blackhole.setPath(newPath, invalidPassword, cryptoProvider)).rejects.toThrow('Invalid password.');
-    });
-
-    it('should get the path of a blackhole', async () => {
-        // Arrange
-        const name = 'blackhole1';
-        const path = 'encryptedPath' as unknown as Encrypted;
-        const password = 'hashedPassword' as unknown as Hashed;
-        const salt = 'salt';
-        const blackhole = new Blackhole(name, path, password, salt);
-        const decryptedPath = '/path/to/blackhole';
-        const securityKey = 'securityKey';
-
-        cryptoProvider.generateSecurityKey = jest.fn().mockResolvedValue(securityKey);
-        cryptoProvider.decrypt = jest.fn().mockResolvedValue(Buffer.from(decryptedPath));
-
-        // Act
-        const result = await blackhole.getPath(password, cryptoProvider);
-
-        // Assert
-        expect(result).toBe(decryptedPath);
-        expect(cryptoProvider.generateSecurityKey).toHaveBeenCalledWith(password, password);
-        expect(cryptoProvider.decrypt).toHaveBeenCalledWith(path, securityKey);
-    });
-
-    it('should throw an error when getting the path of a blackhole with an invalid password', async () => {
-        // Arrange
-        const name = 'blackhole1';
-        const path = 'encryptedPath' as unknown as Encrypted;
-        const password = 'hashedPassword' as unknown as Hashed;
-        const salt = 'salt';
-        const blackhole = new Blackhole(name, path, password, salt);
-        const invalidPassword = 'invalidPassword';
-
-        cryptoProvider.check.mockResolvedValue(false);
-
-        // Act & Assert
-        await expect(blackhole.getPath(invalidPassword, cryptoProvider)).rejects.toThrow('Invalid password.');
+        await expect(blackhole.setSource(newPath, invalidPassword, hashProvider)).rejects.toThrow('Invalid password.');
     });
 
     it('should set the password of a blackhole', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath' as unknown as Encrypted;
+        const source = 'encryptedSource' as Encrypted;
+        const destination = 'encryptedSource' as Encrypted;
         const password = 'hashedPassword' as unknown as Hashed;
-        const salt = 'salt';
-        const blackhole = new Blackhole(name, path, password, salt);
+        const blackhole = new Blackhole(name, source, destination, password);
         const newPassword = 'newPassword123';
         const hashedPassword = 'newHashedPassword';
 
-        cryptoProvider.hash = jest.fn().mockResolvedValue(hashedPassword as Hashed);
+        hashProvider.hash = jest.fn().mockResolvedValue(hashedPassword as Hashed);
 
         // Act
-        await blackhole.setPassword(password, newPassword, cryptoProvider);
+        await blackhole.setPassword(password, newPassword, hashProvider);
 
         // Assert
         expect(blackhole.password).toBe(hashedPassword);
-        expect(cryptoProvider.hash).toHaveBeenCalledWith(newPassword);
+        expect(hashProvider.hash).toHaveBeenCalledWith(newPassword);
     });
 
     it('should throw an error when setting the password of a blackhole with an invalid password', async () => {
         // Arrange
         const name = 'blackhole1';
-        const path = 'encryptedPath' as unknown as Encrypted;
+        const source = 'encryptedSource' as Encrypted;
+        const destination = 'encryptedSource' as Encrypted;
         const password = 'hashedPassword' as unknown as Hashed;
-        const salt = 'salt';
-        const blackhole = new Blackhole(name, path, password, salt);
+        const blackhole = new Blackhole(name, source, destination, password);
         const invalidPassword = 'invalidPassword';
         const newPassword = 'newPassword123';
 
-        cryptoProvider.check.mockResolvedValue(false);
+        hashProvider.check.mockResolvedValue(false);
 
         // Act & Assert
-        await expect(blackhole.setPassword(invalidPassword, newPassword, cryptoProvider)).rejects.toThrow(
+        await expect(blackhole.setPassword(invalidPassword, newPassword, hashProvider)).rejects.toThrow(
             'Invalid password.',
         );
         expect(blackhole.password).toBe(password);

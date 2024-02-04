@@ -1,1 +1,1 @@
-export type Encrypted = Buffer & { readonly __isEncrypted: true };
+export type Encrypted = string & { readonly __isEncrypted: true };

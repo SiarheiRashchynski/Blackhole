@@ -41,7 +41,7 @@ describe('Storage', () => {
             salt: 'salt',
         }) as Blackhole;
 
-        fileOperations.read.mockResolvedValue(JSON.stringify([]));
+        fileOperations.read.mockResolvedValue(Buffer.from(JSON.stringify([])));
         storage = await JsonStorage.create(fileOperations, EntityServices, path);
 
         // Act
@@ -52,11 +52,9 @@ describe('Storage', () => {
         expect(fileOperations.read).toHaveBeenCalledWith(path);
         expect(fileOperations.write).toHaveBeenCalledWith(
             path,
-            Buffer.from(
-                JSON.stringify({
-                    Blackholes: [EntityServices.BlackholeEntityService.factory.toPersistence(blackhole)],
-                }),
-            ),
+            JSON.stringify({
+                Blackholes: [EntityServices.BlackholeEntityService.factory.toPersistence(blackhole)],
+            }),
         );
     });
 
@@ -75,9 +73,11 @@ describe('Storage', () => {
             salt: 'salt',
         }) as Blackhole;
         fileOperations.read.mockResolvedValue(
-            JSON.stringify({
-                Blackholes: [EntityServices.BlackholeEntityService.factory.toPersistence(existingBlackhole)],
-            }),
+            Buffer.from(
+                JSON.stringify({
+                    Blackholes: [EntityServices.BlackholeEntityService.factory.toPersistence(existingBlackhole)],
+                }),
+            ),
         );
         storage = await JsonStorage.create(fileOperations, EntityServices);
 
@@ -89,14 +89,12 @@ describe('Storage', () => {
         expect(fileOperations.read).toHaveBeenCalledWith(path);
         expect(fileOperations.write).toHaveBeenCalledWith(
             path,
-            Buffer.from(
-                JSON.stringify({
-                    Blackholes: [
-                        EntityServices.BlackholeEntityService.factory.toPersistence(existingBlackhole),
-                        EntityServices.BlackholeEntityService.factory.toPersistence(blackhole),
-                    ],
-                }),
-            ),
+            JSON.stringify({
+                Blackholes: [
+                    EntityServices.BlackholeEntityService.factory.toPersistence(existingBlackhole),
+                    EntityServices.BlackholeEntityService.factory.toPersistence(blackhole),
+                ],
+            }),
         );
     });
 
@@ -110,9 +108,11 @@ describe('Storage', () => {
         }) as Blackhole;
 
         fileOperations.read.mockResolvedValue(
-            JSON.stringify({
-                Blackholes: [EntityServices.BlackholeEntityService.factory.toPersistence(existingBlackhole)],
-            }),
+            Buffer.from(
+                JSON.stringify({
+                    Blackholes: [EntityServices.BlackholeEntityService.factory.toPersistence(existingBlackhole)],
+                }),
+            ),
         );
         storage = await JsonStorage.create(fileOperations, EntityServices);
 
@@ -132,20 +132,20 @@ describe('Storage', () => {
             name: 'blackhole1',
             path: '/path/to/blackhole1',
             password: 'password123',
-            salt: 'salt',
         }) as Blackhole;
 
         const newBlackhole = EntityServices.BlackholeEntityService.factory.fromPersistence({
             name: existingBlackhole.name,
             path: '/new/path',
             password: existingBlackhole.password,
-            salt: existingBlackhole.salt,
         }) as Blackhole;
 
         fileOperations.read.mockResolvedValue(
-            JSON.stringify({
-                Blackholes: [EntityServices.BlackholeEntityService.factory.toPersistence(existingBlackhole)],
-            }),
+            Buffer.from(
+                JSON.stringify({
+                    Blackholes: [EntityServices.BlackholeEntityService.factory.toPersistence(existingBlackhole)],
+                }),
+            ),
         );
         storage = await JsonStorage.create(fileOperations, EntityServices);
 
@@ -157,11 +157,9 @@ describe('Storage', () => {
         expect(fileOperations.read).toHaveBeenCalledWith(path);
         expect(fileOperations.write).toHaveBeenCalledWith(
             path,
-            Buffer.from(
-                JSON.stringify({
-                    Blackholes: [EntityServices.BlackholeEntityService.factory.toPersistence(newBlackhole)],
-                }),
-            ),
+            JSON.stringify({
+                Blackholes: [EntityServices.BlackholeEntityService.factory.toPersistence(newBlackhole)],
+            }),
         );
     });
 
@@ -172,22 +170,24 @@ describe('Storage', () => {
                 name: 'blackhole1',
                 path: '/path/to/blackhole1',
                 password: 'password123',
-                salt: 'salt',
             }),
             EntityServices.BlackholeEntityService.factory.fromPersistence({
                 name: 'blackhole2',
                 path: '/path/to/blackhole2',
                 password: '123password',
-                salt: 'salt',
             }),
         ] as Blackhole[];
 
         fileOperations.read.mockResolvedValue(
-            JSON.stringify({
-                Blackholes: [
-                    ...existingBlackholes.map((b) => EntityServices.BlackholeEntityService.factory.toPersistence(b)),
-                ],
-            }),
+            Buffer.from(
+                JSON.stringify({
+                    Blackholes: [
+                        ...existingBlackholes.map((b) =>
+                            EntityServices.BlackholeEntityService.factory.toPersistence(b),
+                        ),
+                    ],
+                }),
+            ),
         );
         storage = await JsonStorage.create(fileOperations, EntityServices);
 
@@ -199,11 +199,9 @@ describe('Storage', () => {
         expect(fileOperations.read).toHaveBeenCalledWith(path);
         expect(fileOperations.write).toHaveBeenCalledWith(
             path,
-            Buffer.from(
-                JSON.stringify({
-                    Blackholes: [EntityServices.BlackholeEntityService.factory.toPersistence(existingBlackholes[1])],
-                }),
-            ),
+            JSON.stringify({
+                Blackholes: [EntityServices.BlackholeEntityService.factory.toPersistence(existingBlackholes[1])],
+            }),
         );
     });
 });
