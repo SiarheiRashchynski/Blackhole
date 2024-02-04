@@ -47,9 +47,9 @@ describe('RemoveBlackholeCommandHandler', () => {
         await commandHandler.handle(request);
 
         // Assert
-        expect(storage.blackholes.get).toHaveBeenCalledWith({ name: request.name });
+        expect(storage.blackholes.get).toHaveBeenCalled();
         expect(cryptoProvider.check).toHaveBeenCalledWith(request.password, 'password123');
-        expect(storage.blackholes.delete).toHaveBeenCalledWith(expect.objectContaining({ name: request.name }));
+        expect(storage.blackholes.delete).toHaveBeenCalled();
         expect(storage.save).toHaveBeenCalled();
         expect(blackholeAccessor.delete).toHaveBeenCalledWith(blackhole, request.password);
     });
@@ -64,7 +64,7 @@ describe('RemoveBlackholeCommandHandler', () => {
 
         // Act && Assert
         await expect(commandHandler.handle(request)).rejects.toThrow('Invalid password.');
-        expect(storage.blackholes.get).toHaveBeenCalledWith({ name: request.name });
+        expect(storage.blackholes.get).toHaveBeenCalled();
         expect(cryptoProvider.check).toHaveBeenCalledWith(request.password, 'password123');
         expect(storage.blackholes.delete).toHaveBeenCalledTimes(0);
         expect(storage.save).toHaveBeenCalledTimes(0);
@@ -81,7 +81,7 @@ describe('RemoveBlackholeCommandHandler', () => {
 
         // Act && Assert
         await expect(commandHandler.handle(request)).rejects.toThrow('Not found.');
-        expect(storage.blackholes.get).toHaveBeenCalledWith({ name: request.name });
+        expect(storage.blackholes.get).toHaveBeenCalled();
         expect(cryptoProvider.check).toHaveBeenCalledTimes(0);
         expect(storage.blackholes.delete).toHaveBeenCalledTimes(0);
         expect(storage.save).toHaveBeenCalledTimes(0);

@@ -26,7 +26,7 @@ export class NavigateToBlackholeCommandHandler implements CommandHandler<Navigat
     ) {}
 
     public async handle(request: NavigateToBlackholeCommand): Promise<void> {
-        const blackhole = await this._storage.blackholes.get({ name: request.name } as Blackhole);
+        const blackhole = await this._storage.blackholes.get((entity) => entity.name === request.name);
         if (!blackhole) {
             throw new Error(`Blackhole '${request.name}' not found.`);
         }
