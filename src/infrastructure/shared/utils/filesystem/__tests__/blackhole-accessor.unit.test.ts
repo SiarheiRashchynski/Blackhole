@@ -30,7 +30,7 @@ describe('BlackholeAccessor', () => {
             // Arrange
             const password = 'password';
             const files = ['file1', 'file2'];
-            const blackhole = new Blackhole('name', 'path' as Encrypted, 'password' as Hashed);
+            const blackhole = new Blackhole('name', 'source' as Encrypted, 'dest' as Encrypted, 'password' as Hashed);
 
             fileOperations.read.mockResolvedValue(Buffer.from('fileData'));
             cryptoProvider.decrypt.mockImplementation((data) => Promise.resolve(Buffer.from(`${data}-decrypted`)));
@@ -40,10 +40,10 @@ describe('BlackholeAccessor', () => {
             await blackholeAccessor.open(blackhole, password);
 
             // Assert
-            expect(fileOperations.readDirectory).toHaveBeenCalledWith('path-decrypted');
+            expect(fileOperations.readDirectory).toHaveBeenCalledWith('dest-decrypted');
 
             files.forEach((file, {}) => {
-                expect(fileOperations.read).toHaveBeenCalledWith(`path-decrypted/${file}`);
+                expect(fileOperations.read).toHaveBeenCalledWith(`dest-decrypted/${file}`);
                 expect(cryptoProvider.decrypt).toHaveBeenCalledWith('fileData' as Encrypted, password);
             });
         });
@@ -53,7 +53,7 @@ describe('BlackholeAccessor', () => {
         it('should create a directory', async () => {
             // Arrange
             const password = 'password';
-            const blackhole = new Blackhole('name', 'path' as Encrypted, 'password' as Hashed);
+            const blackhole = new Blackhole('name', 'source' as Encrypted, 'dest' as Encrypted, 'password' as Hashed);
 
             cryptoProvider.decrypt.mockImplementation((data) => Promise.resolve(Buffer.from(`${data}-decrypted`)));
 
@@ -61,7 +61,8 @@ describe('BlackholeAccessor', () => {
             await blackholeAccessor.map(blackhole, password);
 
             // Assert
-            expect(fileOperations.createDirectory).toHaveBeenCalledWith(`${blackhole.path}-decrypted`);
+            expect(fileOperations.createDirectory).toHaveBeenCalledWith('source-decrypted');
+            expect(fileOperations.createDirectory).toHaveBeenCalledWith('dest-decrypted');
         });
     });
 
@@ -69,7 +70,7 @@ describe('BlackholeAccessor', () => {
         it('should delete a directory', async () => {
             // Arrange
             const password = 'password';
-            const blackhole = new Blackhole('name', 'path' as Encrypted, 'password' as Hashed);
+            const blackhole = new Blackhole('name', 'source' as Encrypted, 'dest' as Encrypted, 'password' as Hashed);
 
             cryptoProvider.decrypt.mockImplementation((data) => Promise.resolve(Buffer.from(`${data}-decrypted`)));
 
@@ -77,7 +78,8 @@ describe('BlackholeAccessor', () => {
             await blackholeAccessor.delete(blackhole, password);
 
             // Assert
-            expect(fileOperations.deleteDirectory).toHaveBeenCalledWith(`${blackhole.path}-decrypted`);
+            expect(fileOperations.deleteDirectory).toHaveBeenCalledWith('source-decrypted');
+            expect(fileOperations.deleteDirectory).toHaveBeenCalledWith('dest-decrypted');
         });
     });
 });

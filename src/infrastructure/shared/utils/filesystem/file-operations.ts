@@ -4,7 +4,7 @@ import { FileOperations as FileOperationsInterface } from './abstractions';
 
 export class FileOperations implements FileOperationsInterface {
     public async createDirectory(path: string): Promise<void> {
-        await mkdir(path);
+        await mkdir(path, { recursive: true });
     }
 
     public async deleteDirectory(path: string): Promise<void> {
