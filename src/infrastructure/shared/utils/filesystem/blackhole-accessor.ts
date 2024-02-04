@@ -15,7 +15,7 @@ export class BlackholeAccessor implements BlackholeAccessorInterface {
     ) {}
 
     public async open(blackhole: Blackhole, password: string): Promise<void> {
-        const path = (await this._cryptoProvider.decrypt(blackhole.path, password)).toString();
+        const path = (await this._cryptoProvider.decrypt(blackhole.destination, password)).toString();
 
         const files = await this._fileOperations.readDirectory(path);
         const decryptedFiles = await Promise.all(
@@ -29,12 +29,16 @@ export class BlackholeAccessor implements BlackholeAccessorInterface {
     }
 
     public async map(blackhole: Blackhole, password: string): Promise<void> {
-        const path = (await this._cryptoProvider.decrypt(blackhole.path, password)).toString();
-        await this._fileOperations.createDirectory(path);
+        const source = (await this._cryptoProvider.decrypt(blackhole.source, password)).toString();
+        const destination = (await this._cryptoProvider.decrypt(blackhole.destination, password)).toString();
+        await this._fileOperations.createDirectory(source);
+        await this._fileOperations.createDirectory(destination);
     }
 
     public async delete(blackhole: Blackhole, password: string): Promise<void> {
-        const path = (await this._cryptoProvider.decrypt(blackhole.path, password)).toString();
-        await this._fileOperations.deleteDirectory(path);
+        const source = (await this._cryptoProvider.decrypt(blackhole.source, password)).toString();
+        const destination = (await this._cryptoProvider.decrypt(blackhole.destination, password)).toString();
+        await this._fileOperations.deleteDirectory(source);
+        await this._fileOperations.deleteDirectory(destination);
     }
 }
