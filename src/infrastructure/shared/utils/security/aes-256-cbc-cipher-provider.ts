@@ -42,11 +42,12 @@ export class Aes256CbcCipherProvider implements CipherProvider {
         return buffer.toString(encoding);
     }
 
-    public generateSecurityKey(password: string, salt?: string): Promise<Buffer> {
-        return new Promise<Buffer>((resolve, reject) => {
-            crypto.scrypt(password, salt || this.generateSalt(), this._keyLength, (err, derivedKey) => {
+    public generateSecurityKey(password: string, salt?: string): Promise<[Buffer, string]> {
+        salt = salt || this.generateSalt();
+        return new Promise<[Buffer, string]>((resolve, reject) => {
+            crypto.scrypt(password, salt!, this._keyLength, (err, derivedKey) => {
                 if (err) reject(err);
-                else resolve(derivedKey);
+                else resolve([derivedKey, salt!]);
             });
         });
     }

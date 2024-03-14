@@ -30,7 +30,7 @@ export class CryptoProvider implements CryptoProviderInterface {
         return this._cipherProvider.decrypt(content, encryptionKey, encoding);
     }
 
-    public generateSecurityKey(password: string, salt?: string): Promise<Buffer> {
+    public generateSecurityKey(password: string, salt?: string): Promise<[Buffer, string]> {
         return this._cipherProvider.generateSecurityKey(password, salt);
     }
 

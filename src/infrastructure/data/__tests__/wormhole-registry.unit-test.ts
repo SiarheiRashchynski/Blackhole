@@ -16,6 +16,7 @@ describe('WormholeRegistry', () => {
             encrypt: jest.fn(),
             decrypt: jest.fn(),
             hash: jest.fn(),
+            check: jest.fn(),
         } as any;
         storage = {
             read: jest.fn(),
@@ -39,6 +40,7 @@ describe('WormholeRegistry', () => {
             });
 
             cryptoProvider.hash.mockResolvedValue({ value: 'wormhole1' } as Hashed);
+            cryptoProvider.check.mockResolvedValue(true);
             storage.read.mockResolvedValue(JSON.stringify([{ key: 'wormhole1' }] as any));
 
             // Act & Assert
@@ -59,7 +61,7 @@ describe('WormholeRegistry', () => {
             storage.read.mockResolvedValue(JSON.stringify([]));
             cryptoProvider.generateSalt.mockReturnValue('salt');
             cryptoProvider.hash.mockResolvedValue({ value: 'wormhole1' } as Hashed);
-            cryptoProvider.generateSecurityKey.mockResolvedValue(Buffer.from('key'));
+            cryptoProvider.generateSecurityKey.mockResolvedValue([Buffer.from('key'), 'salt']);
             cryptoProvider.encrypt.mockResolvedValue(new Encrypted('encrypted', 'algorithm', 'iv'));
 
             // Act
@@ -89,6 +91,7 @@ describe('WormholeRegistry', () => {
             const name = 'wormhole1';
             const password = 'password';
 
+            cryptoProvider.check.mockResolvedValue(true);
             cryptoProvider.hash.mockResolvedValue({ value: 'wormhole1' } as Hashed);
 
             const content = {
@@ -150,6 +153,7 @@ describe('WormholeRegistry', () => {
                 diskMock = content;
                 return Promise.resolve();
             });
+            cryptoProvider.check.mockResolvedValue(true);
             cryptoProvider.generateSalt.mockReturnValue('salt');
             cryptoProvider.hash.mockResolvedValue({ value: 'wormhole1' } as Hashed);
             cryptoProvider.encrypt.mockImplementation((content) =>

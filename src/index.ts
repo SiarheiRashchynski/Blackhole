@@ -1,3 +1,5 @@
+import './infrastructure/shared/extensions';
+
 import './infrastructure/containers';
 
 import './app/commands';

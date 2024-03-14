@@ -1,13 +1,21 @@
-import { readFile, rm, unlink, writeFile } from 'fs/promises';
+import { readFile, rm, unlink } from 'fs/promises';
 import path from 'path';
 
 import execa from 'execa';
+import { container } from 'tsyringe';
 
+import { Wormhole } from '../../../domain/models';
+import { WormholeRegistry } from '../../../infrastructure/data/wormhole-registry';
 import { path as basePath } from '../../../test-constants';
 
 describe('FormWormholeCommand', () => {
     const databasePath = path.join(basePath, 'wormhole.json');
+    let wormholeRegistry: WormholeRegistry;
     let wormholeDirectories: string[] = [];
+
+    beforeEach(() => {
+        wormholeRegistry = container.resolve(WormholeRegistry);
+    });
 
     afterEach(async () => {
         try {
@@ -57,10 +65,12 @@ describe('FormWormholeCommand', () => {
         wormholeDirectories.push(path.join(basePath, 'path/to/destionation'));
 
         // Arrange
-        const wormholes = {
-            Blackholes: [{ name: 'wormhole1', password: 'password123', source: 'source', destination: 'destination' }],
-        };
-        await writeFile(databasePath, JSON.stringify(wormholes));
+        const existingWormhole = new Wormhole({
+            stellarCode: 'stellarCode1',
+            eventHorizon: 'eventHorizon1',
+            singularity: 'singularity1',
+        });
+        await wormholeRegistry.save(existingWormhole, 'password123');
 
         // Act
         await execa(
@@ -74,15 +84,13 @@ describe('FormWormholeCommand', () => {
         // Assert
         const data = await readFile(databasePath, 'utf-8');
         const db = JSON.parse(data);
+        const wormhole = (await wormholeRegistry.load('wormhole2', 'password'))!;
 
-        expect(db).not.toContainEqual(
-            expect.objectContaining({
-                Blackholes: expect.arrayContaining([
-                    ...wormholes.Blackholes,
-                    { name: 'wormhole2', password: 'password123' },
-                ]),
-            }),
-        );
+        expect(db).toHaveLength(2);
+        expect(wormhole).toBeDefined();
+        expect(wormhole.stellarCode).toBe('wormhole2');
+        expect(wormhole.eventHorizon).toBe(wormholeDirectories[0]);
+        expect(wormhole.singularity).toBe(wormholeDirectories[1]);
     });
 
     it('The wormhole should not be added since it already exists', async () => {
@@ -90,28 +98,28 @@ describe('FormWormholeCommand', () => {
         wormholeDirectories.push(path.join(basePath, 'path/to/destionation'));
 
         // Arrange
-        const wormholes = {
-            Blackholes: [{ name: 'wormhole1', password: 'password123', source: 'source', destination: 'destination' }],
-        };
-        await writeFile(databasePath, JSON.stringify(wormholes));
+        const existingWormhole = new Wormhole({
+            stellarCode: 'stellarCode1',
+            eventHorizon: 'eventHorizon1',
+            singularity: 'singularity1',
+        });
+        await wormholeRegistry.save(existingWormhole, 'password');
 
         // Act & Assert
         await expect(
             execa(
                 'yarn',
-                ['start', 'form', 'wormhole1', `${wormholeDirectories[0]}:${wormholeDirectories[1]}`, 'password'],
+                ['start', 'form', 'stellarCode1', `${wormholeDirectories[0]}:${wormholeDirectories[1]}`, 'password'],
                 {
                     env: { NODE_ENV: 'test' },
                 },
             ),
-        ).rejects.toThrow(expect.objectContaining({ message: expect.stringContaining('Entity already exists') }));
+        ).rejects.toThrow(
+            expect.objectContaining({ message: expect.stringContaining('Wormhole with the same key already exists') }),
+        );
 
         const data = await readFile(databasePath, 'utf-8');
         const db = JSON.parse(data);
-
-        expect(db.Blackholes.length).toBe(1);
-        expect(db.Blackholes).toEqual(
-            expect.arrayContaining([expect.objectContaining({ name: 'wormhole1', password: 'password123' })]),
-        );
+        expect(db.length).toBe(1);
     });
 });

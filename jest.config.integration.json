@@ -13,6 +13,9 @@
     "setupFiles": [
         "./src/jest.setup.integration.ts"
     ],
+    "setupFilesAfterEnv": [
+        "./src/jest.setup.integration.after-env.ts"
+    ],
     "moduleFileExtensions": [
         "ts",
         "js",
