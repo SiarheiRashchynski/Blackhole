@@ -1,1 +1,1 @@
-export * from './blackhole/blackhole';
+export * from './wormhole';
