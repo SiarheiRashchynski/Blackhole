@@ -2,7 +2,7 @@ import { Command } from 'commander';
 
 const program = new Command();
 
-program.version('0.0.1', '-v, --version').name('blackhole');
+program.version('0.0.1', '-v, --version').name('wormhole');
 
 export interface CliCommandOption {
     flag: string;

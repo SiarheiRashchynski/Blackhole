@@ -1,5 +1,5 @@
 {
-    "name": "blackhole",
+    "name": "wormhole",
     "dockerComposeFile": "docker-compose.yml",
     "service": "app",
     "workspaceFolder": "/workspace",
@@ -9,7 +9,8 @@
                 "dbaeumer.vscode-eslint",
                 "christian-kohler.npm-intellisense",
                 "github.vscode-github-actions",
-                "Orta.vscode-jest"
+                "Orta.vscode-jest",
+                "esbenp.prettier-vscode"
             ]
         }
     }

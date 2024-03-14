@@ -1,12 +1,12 @@
 version: '3'
-name: 'blackhole-devcontainer'
+name: 'wormhole-devcontainer'
 services:
     app:
         build:
             context: .
             dockerfile: Dockerfile
-        image: blackhole.dev-environment
-        container_name: blackhole.dev-environment
+        image: wormhole.dev-environment
+        container_name: wormhole.dev-environment
         volumes:
             - ..:/workspace
             - node_modules:/workspace/node_modules
