@@ -12,7 +12,7 @@ describe('WormholeRegistry', () => {
     beforeEach(() => {
         cryptoProvider = {
             generateSalt: jest.fn(),
-            generateSecurityKey: jest.fn(),
+            generateSecurityKey: jest.fn().mockReturnValue([Buffer.from('key'), 'salt']),
             encrypt: jest.fn(),
             decrypt: jest.fn(),
             hash: jest.fn(),
@@ -61,7 +61,6 @@ describe('WormholeRegistry', () => {
             storage.read.mockResolvedValue(JSON.stringify([]));
             cryptoProvider.generateSalt.mockReturnValue('salt');
             cryptoProvider.hash.mockResolvedValue({ value: 'wormhole1' } as Hashed);
-            cryptoProvider.generateSecurityKey.mockResolvedValue([Buffer.from('key'), 'salt']);
             cryptoProvider.encrypt.mockResolvedValue(new Encrypted('encrypted', 'algorithm', 'iv'));
 
             // Act
